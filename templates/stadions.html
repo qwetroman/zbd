@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for post in posts %}
+      <h1> {{post.adres}}: 12 </h1>
+      <p> Ilośc miejsc: {{post.seats}} </p>
+    {% endfor %}
+  <div class='btn btn-outline-info'>
+    <a href="{{ url_for('AddStadion') }}">Dodaj stadion</a>
+  </div>
+
+  {% endblock content %}

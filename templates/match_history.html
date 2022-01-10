@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for post in posts %}
+      <h1> {{post.team1}}: 12 </h1>
+      <p> Data gry: {{post.data_gry}} </p>
+      <p> Stadion: {{post.stadion}} </p>
+    {% endfor %}
+  <div class='btn btn-outline-info'>
+    <a href="{{ url_for('AddGame') }}">Dodaj grę</a>
+  </div>
+
+  {% endblock content %}

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for post in posts %}
+      <h1> {{post.nazwa}} </h1>
+      <p> Ilosc graczy: {{post.Number_of_players}} </p>
+      <p> Domowy stadion: {{post.Home_stadion}} </p>
+      <p> Imie menadżera: {{post.Manager_name}} </p>
+      <p> Nazwisko menadżera: {{post.Manager_lastname}} </p>
+    {% endfor %}
+  <div class='btn btn-outline-info'>
+    <a href="{{ url_for('AddTeam') }}">Dodaj drużynę</a>
+  </div>
+  {% endblock content %}

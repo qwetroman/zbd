@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content section">
+      <form method = "POST" action ="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+          <legend class = "border bottom mb-4"> Dodawanie gry </legend>
+
+          <div class="form group">
+            {{ form.TeamO.label(class="form-control-label") }}
+
+                    {% if form.TeamO.errors %}
+                        {{ form.TeamO(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.TeamO.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.TeamO(class="form-control form-control-lg") }}
+                    {% endif %}
+          </div>
+
+          <div class="form group">
+            {{ form.TeamT.label(class="form-control-label") }}
+
+                    {% if form.TeamT.errors %}
+                        {{ form.TeamT(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.TeamO.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.TeamT(class="form-control form-control-lg") }}
+                    {% endif %}
+          </div>
+
+          <div class="form group">
+            {{ form.StadionName.label(class="form-control-label") }}
+
+                    {% if form.StadionName.errors %}
+                        {{ form.StadionName(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.StadionName.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.StadionName(class="form-control form-control-lg") }}
+                    {% endif %}
+          </div>
+
+          <div class="form group">
+            {{ form.GameDate.label(class="form-control-label") }}
+
+                    {% if form.GameDate.errors %}
+                        {{ form.GameDate(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.TeamO.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.GameDate(class="form-control form-control-lg") }}
+                    {% endif %}
+          </div>
+
+
+
+
+        </fieldset>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+      </form>
+    </div>
+    {% endblock content %}
