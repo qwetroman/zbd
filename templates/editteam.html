@@ -1,10 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
+{% for post in posts %}
+  <h1> {{post.nazwa}} </h1>
+  <p> Ilosc graczy: {{post.Number_of_players}} </p>
+  <p> Domowy stadion: {{post.Home_stadion}} </p>
+  <p> Imie menadżera: {{post.Manager_name}} </p>
+  <p> Nazwisko menadżera: {{post.Manager_lastname}} </p>
+{% endfor %}
     <div class="content section">
       <form method = "POST" action ="">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
-          <legend class = "border bottom mb-4"> Dodawanie drużyny </legend>
+          <legend class = "border bottom mb-4"> Edytuj drużyny </legend>
 
           <div class="form group">
             {{ form.TeamName.label(class="form-control-label") }}

@@ -1,8 +1,8 @@
 from flask import Flask, render_template, flash, redirect, url_for
-from forms import AddTeamForm, AddGameForm, AddStadionForm
-from baza import polaczenie, odlacz
-import mysql.connector
-from mysql.connector import Error
+from forms import AddTeamForm, AddGameForm, AddStadionForm, AddPlayerForm, EditTeamForm
+from baza import polaczenie, odlacz, pobierz_druzyny, pobierz_zawodnikow, pobierz_druzyny_do_edycji
+# import mysql.connector
+# from mysql.connector import Error
 
 app = Flask(__name__)
 
@@ -10,48 +10,6 @@ app.config['SECRET_KEY'] = 'e185681a407ace961e0bf2fdcdced1c7'
 
 connection, cursor = polaczenie()
 
-
-def pobierz_druzyny(connection, cursor):
-    komenda = ("SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
-
-    cursor.execute(komenda)
-
-    myresult = cursor.fetchall()
-    teams = []
-    for x in myresult:
-        team = {'nazwa': x[1],
-                'Number_of_players': x[2],
-                'Manager_name': x[3],
-                'Manager_lastname': x[4],
-                'Home_stadion': 'temp'}
-
-        teams.append(team)
-    return teams
-
-
-# Druzyny = [
-#
-#     {
-#         'nazwa': 'temp',
-#         'Id': 10000,
-#         'Number_of_players': 12,
-#         'Coach_id': 10001,
-#         'Manager_id': 10002,
-#         'Home_stadion': 'temp'
-#
-#
-#     },
-#
-#     {
-#         'nazwa': 'temp2',
-#         'Id': 10001,
-#         'Number_of_players': 17,
-#         'Coach_id': 10001,
-#         'Manager_id': 10002,
-#         'Home_stadion': 'Zlocieniec'
-#
-#     }
-# ]
 
 History = [
     {
@@ -71,17 +29,17 @@ Stadiony = [
 ]
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     return render_template('home.html')
 
 
-@app.route('/about')
+@app.route('/teams', methods=['GET', 'POST'])
 def about():
     connection, cursor = polaczenie()
     Druzyny = pobierz_druzyny(connection, cursor)
     odlacz(cursor, connection)
-    return render_template('about.html', title='Druzyny', posts=Druzyny)
+    return render_template('teams.html', title='Druzyny', posts=Druzyny)
 
 
 @app.route('/match_history')
@@ -94,6 +52,14 @@ def match_history():
 def stadions():
     return render_template('stadions.html', title='Stadiony',
                            posts=Stadiony)
+
+
+@app.route('/players')
+def players():
+    connection, cursor = polaczenie()
+    Gracze = pobierz_zawodnikow(connection, cursor)
+    odlacz(cursor, connection)
+    return render_template('players.html', title="Gracze", posts=Gracze)
 
 
 @app.route('/AddTeam', methods=['GET', 'POST'])
@@ -136,6 +102,36 @@ def AddStadion():
 
     return render_template('add_stadion.html',
                            form=form, title='Dodawanie stadionu')
+
+
+@app.route('/add_player', methods=['GET', 'POST'])
+def AddPlayer():
+    form = AddPlayerForm()
+    if form.validate_on_submit():
+        flash(
+            'Zawodnik został pomyślnie dodany',
+            'success')
+
+        return redirect(url_for('home'))
+
+    return render_template('addplayer.html',
+                           form=form, title='Dodawanie zawodnika')
+
+
+@app.route('/teams/editteam/<variable>')
+def EditTeam(variable, methods=['GET', 'POST']):
+    form = EditTeamForm()
+    connection, cursor = polaczenie()
+    Druzyny = pobierz_druzyny_do_edycji(connection, cursor, variable)
+    if form.validate_on_submit():
+        flash(
+            'Drużyna została pomyślnie edytowana',
+            'success')
+
+        return redirect(url_for('home'))
+    else:
+        return render_template('editteam.html',
+                               form=form, title='Edytowanie drużyny', posts=Druzyny)
 
 
 if __name__ == '__main__':

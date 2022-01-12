@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for post in posts %}
+      <h1> {{post.name}} {{post.last_name}} </h1>
+      <p> Numer telefonu: {{post.phone_number}} </p>
+      <p> Drużyna: {{post.team}} </p>
+    {% endfor %}
+  <div class='btn btn-outline-info'>
+    <a href="{{ url_for('AddPlayer') }}">Dodaj gracza</a>
+  </div>
+  {% endblock content %}

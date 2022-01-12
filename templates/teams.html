@@ -6,7 +6,15 @@
       <p> Domowy stadion: {{post.Home_stadion}} </p>
       <p> Imie menadżera: {{post.Manager_name}} </p>
       <p> Nazwisko menadżera: {{post.Manager_lastname}} </p>
+      <div class='btn btn-outline-info'>
+        <a href={{ url_for('EditTeam', variable=post.id) }}>Edytuj projekt</a>
+      </div>
     {% endfor %}
+    <p>
+
+
+
+    </p>
   <div class='btn btn-outline-info'>
     <a href="{{ url_for('AddTeam') }}">Dodaj drużynę</a>
   </div>
