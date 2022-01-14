@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for
+from flask import Flask, render_template, flash, redirect, url_for, request
 from forms import AddTeamForm, AddGameForm, AddStadionForm, AddPlayerForm, EditTeamForm
 from baza import polaczenie, odlacz, pobierz_druzyny, pobierz_zawodnikow, pobierz_druzyny_do_edycji
 # import mysql.connector
@@ -7,8 +7,6 @@ from baza import polaczenie, odlacz, pobierz_druzyny, pobierz_zawodnikow, pobier
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'e185681a407ace961e0bf2fdcdced1c7'
-
-connection, cursor = polaczenie()
 
 
 History = [
@@ -36,6 +34,12 @@ def home():
 
 @app.route('/teams', methods=['GET', 'POST'])
 def about():
+    if request.method == 'POST':
+        flash(
+            'Drużyna została pomyślnie edytowana',
+            'success')
+        print(request.form.get('TeamName'))
+        return redirect(url_for('about'))
     connection, cursor = polaczenie()
     Druzyny = pobierz_druzyny(connection, cursor)
     odlacz(cursor, connection)
@@ -118,8 +122,8 @@ def AddPlayer():
                            form=form, title='Dodawanie zawodnika')
 
 
-@app.route('/teams/editteam/<variable>')
-def EditTeam(variable, methods=['GET', 'POST']):
+@app.route('/teams/teams/edit<int:variable>')
+def EditTeam(variable=None, methods=['POST', 'GET']):
     form = EditTeamForm()
     connection, cursor = polaczenie()
     Druzyny = pobierz_druzyny_do_edycji(connection, cursor, variable)
@@ -127,11 +131,15 @@ def EditTeam(variable, methods=['GET', 'POST']):
         flash(
             'Drużyna została pomyślnie edytowana',
             'success')
-
-        return redirect(url_for('home'))
-    else:
-        return render_template('editteam.html',
-                               form=form, title='Edytowanie drużyny', posts=Druzyny)
+        return redirect(url_for('match_history'))
+    elif request.method == 'GET':
+        form.TeamName.data = Druzyny[0]['nazwa']
+        form.NumberOfPlayers.data = Druzyny[0]['Number_of_players']
+        form.TeamManagerName.data = Druzyny[0]['Manager_name']
+        form.TeamManagerSurname.data = Druzyny[0]['Manager_lastname']
+    return render_template('editteam.html',
+                           form=form, title='Edytowanie drużyny', posts=Druzyny,
+                           variable=variable)
 
 
 if __name__ == '__main__':

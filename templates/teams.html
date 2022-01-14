@@ -7,7 +7,10 @@
       <p> Imie menadżera: {{post.Manager_name}} </p>
       <p> Nazwisko menadżera: {{post.Manager_lastname}} </p>
       <div class='btn btn-outline-info'>
-        <a href={{ url_for('EditTeam', variable=post.id) }}>Edytuj projekt</a>
+        <a href="{{ url_for('EditTeam', variable=post.id) }}">Edytuj drużynę</a>
+      </div>
+      <div class='btn btn-outline-danger'>
+      <a href="{{ url_for('AddTeam') }}">Usuń drużynę</a>
       </div>
     {% endfor %}
     <p>
