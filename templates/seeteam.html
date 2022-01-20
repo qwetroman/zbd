@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1> {{title}} </h1>
+    {% for post in posts %}
+      <p> {{ post.name }} {{ post.last_name }} {{ post.phone_number }} </p>
+    {% endfor %}
+    <p>
+
+
+    </p>
+    <div class='btn btn-outline-warning'>
+      <a href="{{ url_for('EditSquad',variable=variable) }}">Edytuj skład</a>
+    </div>
+  {% endblock content %}

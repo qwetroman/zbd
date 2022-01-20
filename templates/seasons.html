@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for post in posts %}
+      <h1> {{post.name}} </h1>
+      <p> Kraj: {{post.country}} </p>
+      <p> Początek: {{post.beggining}} </p>
+      <p> Koniec: {{ post.end }} </p>
+      <div class='btn btn-outline-warning'>
+        <a href="{{ url_for('home') }}">Edytuj sezon</a>
+      </div>
+    {% endfor %}
+
+  <p>
+  </p>
+  <p>
+  </p>
+  <div class='btn btn-outline-info'>
+    <a href="{{ url_for('AddSeason') }}">Dodaj sezon</a>
+  </div>
+  {% endblock content %}

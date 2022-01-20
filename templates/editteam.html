@@ -1,99 +1,42 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="content section">
-      <form method = "POST" action ="{{ url_for('about') }}">
+      <form method = "POST" action ="">
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
           <legend class = "border bottom mb-4"> Dodawanie drużyny </legend>
 
           <div class="form group">
             {{ form.TeamName.label(class="form-control-label") }}
-
-                    {% if form.TeamName.errors %}
-                        {{ form.TeamName(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.TeamName.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.TeamName(class="form-control form-control-lg") }}
-                    {% endif %}
+            {{ form.TeamName(class="form-control form-control-lg") }}
           </div>
 
           <div class="form group">
             {{ form.NumberOfPlayers.label(class="form-control-label") }}
-
-                    {% if form.NumberOfPlayers.errors %}
-                        {{ form.NumberOfPlayers(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.TeamName.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.NumberOfPlayers(class="form-control form-control-lg") }}
-                    {% endif %}
+            {{ form.NumberOfPlayers(class="form-control form-control-lg") }}
           </div>
 
           <div class="form group">
             {{ form.StadionName.label(class="form-control-label") }}
+            {{ form.StadionName(class="form-control form-control-lg") }}
 
-                    {% if form.StadionName.errors %}
-                        {{ form.StadionName(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.TeamName.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.StadionName(class="form-control form-control-lg") }}
-                    {% endif %}
           </div>
 
           <div class="form group">
             {{ form.TeamManagerName.label(class="form-control-label") }}
+            {{ form.TeamManagerName(class="form-control form-control-lg") }}
 
-                    {% if form.TeamManagerName.errors %}
-                        {{ form.TeamManagerName(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.TeamName.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.TeamManagerName(class="form-control form-control-lg") }}
-                    {% endif %}
           </div>
 
           <div class="form group">
             {{ form.TeamManagerSurname.label(class="form-control-label") }}
+            {{ form.TeamManagerSurname(class="form-control form-control-lg") }}
 
-                    {% if form.TeamName.errors %}
-                        {{ form.TeamManagerSurname(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.TeamName.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.TeamManagerSurname(class="form-control form-control-lg") }}
-                    {% endif %}
           </div>
 
           <div class="form group">
             {{ form.BudgetBalance.label(class="form-control-label") }}
-
-                    {% if form.BudgetBalance.errors %}
-                        {{ form.BudgetBalance(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.TeamName.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.BudgetBalance(class="form-control form-control-lg") }}
-                    {% endif %}
+            {{ form.BudgetBalance(class="form-control form-control-lg") }}
           </div>
 
           <div class="form group">
@@ -103,32 +46,13 @@
 
         <div class="form group">
           {{ form.BudgetProfit.label(class="form-control-label") }}
-
-                  {% if form.BudgetProfit.errors %}
-                      {{ form.TeamName(class="form-control form-control-lg is-invalid") }}
-                      <div class="invalid-feedback">
-                          {% for error in form.TeamName.errors %}
-                              <span>{{ error }}</span>
-                          {% endfor %}
-                      </div>
-                  {% else %}
-                      {{ form.BudgetProfit(class="form-control form-control-lg") }}
-                  {% endif %}
+          {{ form.BudgetProfit(class="form-control form-control-lg") }}
         </div>
 
         <div class="form group">
           {{ form.BudgetExpenses.label(class="form-control-label") }}
+          {{ form.BudgetExpenses(class="form-control form-control-lg") }}
 
-                  {% if form.BudgetExpenses.errors %}
-                      {{ form.BudgetExpenses(class="form-control form-control-lg is-invalid") }}
-                      <div class="invalid-feedback">
-                          {% for error in form.TeamName.errors %}
-                              <span>{{ error }}</span>
-                          {% endfor %}
-                      </div>
-                  {% else %}
-                      {{ form.BudgetExpenses(class="form-control form-control-lg") }}
-                  {% endif %}
         </div>
 
         </fieldset>

@@ -1,13 +1,14 @@
 from flask import Flask, render_template, flash, redirect, url_for, request
-from forms import AddTeamForm, AddGameForm, AddStadionForm, AddPlayerForm, EditTeamForm
-from baza import polaczenie, odlacz, pobierz_druzyny, pobierz_zawodnikow, pobierz_druzyny_do_edycji
+from forms import (AddTeamForm, AddGameForm, AddStadionForm, AddPlayerForm,
+                   EditTeamForm, AddSeasonForm, EditSquadForm)
+from baza import (polaczenie, odlacz, pobierz_druzyny, pobierz_zawodnikow,
+                  pobierz_druzyny_do_edycji, pobierz_sklad, pobierz_sezony)
 # import mysql.connector
 # from mysql.connector import Error
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'e185681a407ace961e0bf2fdcdced1c7'
-
 
 History = [
     {
@@ -19,11 +20,10 @@ History = [
 ]
 Stadiony = [
     {
+        'nazwa': 'cokolwiek',
         'adres': 'temp',
         'seats': 'temp2'
     }
-
-
 ]
 
 
@@ -34,12 +34,6 @@ def home():
 
 @app.route('/teams', methods=['GET', 'POST'])
 def about():
-    if request.method == 'POST':
-        flash(
-            'Drużyna została pomyślnie edytowana',
-            'success')
-        print(request.form.get('TeamName'))
-        return redirect(url_for('about'))
     connection, cursor = polaczenie()
     Druzyny = pobierz_druzyny(connection, cursor)
     odlacz(cursor, connection)
@@ -66,16 +60,16 @@ def players():
     return render_template('players.html', title="Gracze", posts=Gracze)
 
 
+@app.route('/seasons', methods=['GET', 'POST'])
+def seasons():
+    connection, cursor = polaczenie()
+    sezony = pobierz_sezony(connection, cursor)
+    return render_template('seasons.html', title='Sezony', posts=sezony)
+
+
 @app.route('/AddTeam', methods=['GET', 'POST'])
 def AddTeam():
     form = AddTeamForm()
-    if form.validate_on_submit():
-        flash(
-            f'Druzyna {form.TeamName.data} zostala pomyslnie dodana',
-            'success')
-
-        return redirect(url_for('home'))
-
     return render_template('addteam.html',
                            form=form, title='Dodawanie druzyny')
 
@@ -122,8 +116,20 @@ def AddPlayer():
                            form=form, title='Dodawanie zawodnika')
 
 
-@app.route('/teams/teams/edit<int:variable>')
-def EditTeam(variable=None, methods=['POST', 'GET']):
+@app.route('/seasons/add', methods=['GET', 'POST'])
+def AddSeason():
+    form = AddSeasonForm()
+    if form.validate_on_submit():
+        flash(
+            'Sezon został pomyślnie dodany',
+            'success')
+        return redirect(url_for('home'))
+    return render_template('addseason.html',
+                           form=form, title='Dodawanie stadionu')
+
+
+@app.route('/teams/edit/<int:variable>', methods=['GET', 'POST'])
+def EditTeam(variable):
     form = EditTeamForm()
     connection, cursor = polaczenie()
     Druzyny = pobierz_druzyny_do_edycji(connection, cursor, variable)
@@ -131,15 +137,44 @@ def EditTeam(variable=None, methods=['POST', 'GET']):
         flash(
             'Drużyna została pomyślnie edytowana',
             'success')
-        return redirect(url_for('match_history'))
+        return redirect(url_for('about'))
     elif request.method == 'GET':
         form.TeamName.data = Druzyny[0]['nazwa']
         form.NumberOfPlayers.data = Druzyny[0]['Number_of_players']
         form.TeamManagerName.data = Druzyny[0]['Manager_name']
         form.TeamManagerSurname.data = Druzyny[0]['Manager_lastname']
     return render_template('editteam.html',
-                           form=form, title='Edytowanie drużyny', posts=Druzyny,
-                           variable=variable)
+                           form=form, title='Edytowanie drużyny',
+                           posts=Druzyny, variable=variable)
+
+
+@app.route('/teams/squad/edit/<int:variable>', methods=['GET', 'POST'])
+def EditSquad(variable):
+    connection, cursor = polaczenie()
+    Druzyny = pobierz_sklad(connection, cursor, variable)
+    form = EditSquadForm()
+    if form.validate_on_submit():
+        flash(
+            'Drużyna została pomyślnie edytowana',
+            'success')
+        return redirect(url_for('SeeTeam', variable))
+    elif request.method == 'GET':
+        form.name1.data = Druzyny[0]['name']
+        form.last_name1.data = Druzyny[0]['last_name']
+        form.phone1.data = Druzyny[0]['phone_number']
+
+    return render_template('editsquad.html',
+                           title=f'Edycja {Druzyny[0]["team_name"]}',
+                           posts=Druzyny, variable=variable, form=form)
+
+
+@app.route('/teams/see<int:variable>')
+def SeeTeam(variable=None, methods=['GET']):
+    connection, cursor = polaczenie()
+    Druzyny = pobierz_sklad(connection, cursor, variable)
+    return render_template('seeteam.html',
+                           title=f'Skład {Druzyny[0]["team_name"]}',
+                           posts=Druzyny, variable=variable)
 
 
 if __name__ == '__main__':

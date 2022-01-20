@@ -1,11 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
     {% for post in posts %}
-      <h1> {{post.adres}}: 12 </h1>
+      <h1> {{post.nazwa}} </h1>
+      <p> Adres: {{post.adres}} </p>
       <p> Ilośc miejsc: {{post.seats}} </p>
+      <div class='btn btn-outline-warning'>
+        <a href="{{ url_for('AddStadion') }}">Edytuj stadion</a>
+      </div>
     {% endfor %}
+
+  <p>
+  </p>
+  <p>
+  </p>
   <div class='btn btn-outline-info'>
     <a href="{{ url_for('AddStadion') }}">Dodaj stadion</a>
   </div>
-
   {% endblock content %}

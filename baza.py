@@ -88,3 +88,43 @@ def pobierz_druzyny_do_edycji(connection, cursor, id):
 
         teams.append(team)
     return teams
+
+
+def pobierz_sklad(connection, cursor, id):
+    komenda = ("SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name FROM PLAYERS INNER JOIN FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
+
+    cursor.execute(komenda, (int(id),))
+    # cursor.execute(komenda)
+
+    myresult = cursor.fetchall()
+    squads = []
+    for x in myresult:
+        squad = {'name': x[0],
+                 'last_name': x[1],
+                 'phone_number': x[2],
+                 'team_name': x[4],
+                 'id': x[3]
+                 }
+
+        squads.append(squad)
+    return squads
+
+
+def pobierz_sezony(connection, cursor):
+    komenda = ("SELECT * FROM SEASON ORDER BY BEGGINING;")
+
+    cursor.execute(komenda)
+    # cursor.execute(komenda)
+
+    myresult = cursor.fetchall()
+    seasons = []
+    for x in myresult:
+        season = {'name': x[2],
+                  'country': x[1],
+                  'beggining': x[3],
+                  'end': x[4],
+                  'id': x[0]
+                  }
+
+        seasons.append(season)
+    return seasons
