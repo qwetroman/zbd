@@ -1,14 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
+<table id = "teams" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th class="th-sm">Nazwa
+      </th>
+      <th class="th-sm">adres
+      </th>
+      <th class="th-sm">Ilośc miejsc
+      </th>
+      <th class="th-sm">Edutuj
+      </th>
+      <th class="th-sm">Usuń
+      </th>
+    </tr>
+  </thead>
+  <tbody>
     {% for post in posts %}
-      <h1> {{post.nazwa}} </h1>
-      <p> Adres: {{post.adres}} </p>
-      <p> Ilośc miejsc: {{post.seats}} </p>
-      <div class='btn btn-outline-warning'>
+    <tr>
+      <td> {{post.nazwa}} </td>
+      <td> {{post.adres}} </td>
+      <td> {{post.seats}} </td>
+      <td><div class='btn btn-outline-warning'>
         <a href="{{ url_for('AddStadion') }}">Edytuj stadion</a>
-      </div>
+      </div></td>
+      <td><div class='btn btn-outline-danger'>
+        <a href="{{ url_for('about') }}">Usuń stadion</a>
+      </div></td>
+    </tr>
     {% endfor %}
-
+  </tbody>
+  </table>
   <p>
   </p>
   <p>
@@ -17,3 +39,18 @@
     <a href="{{ url_for('AddStadion') }}">Dodaj stadion</a>
   </div>
   {% endblock content %}
+
+  {% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#teams').DataTable({
+        columns: [
+          null,
+          {searchable: false},
+          {orderable: false, searchable: false},
+          {orderable: false, searchable: false},
+          null],
+      });
+    });
+  </script>
+{% endblock %}
