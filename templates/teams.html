@@ -1,27 +1,60 @@
 {% extends "layout.html" %}
 {% block content %}
+<table id = "teams" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+  <thead>
+      <tr>
+          <th class="th-sm">Nazwa
+          </th>
+          <th class="th-sm">Ilośc graczy
+          </th>
+          <th class="th-sm">Stadion domowy
+          </th>
+          <th class="th-sm">Imie i nazwisko menadżera
+          </th>
+          <th class="th-sm">Zobacz
+          </th>
+          <th class="th-sm">Edutuj
+          </th>
+          <th class="th-sm">Usuń
+          </th>
+        </tr>
+    </thead>
+    <tbody>
     {% for post in posts %}
-      <h1> {{post.nazwa}} </h1>
-      <p> Ilosc graczy: {{post.Number_of_players}} </p>
-      <p> Domowy stadion: {{post.Home_stadion}} </p>
-      <p> Imie menadżera: {{post.Manager_name}} </p>
-      <p> Nazwisko menadżera: {{post.Manager_lastname}} </p>
-      <div class='btn btn-outline-info'>
+    <tr>
+      <td> {{post.nazwa}} </td>
+      <td> {{post.Number_of_players}} </td>
+      <td> {{post.Home_stadion}} </td>
+      <td> {{post.Manager_name}} {{post.Manager_lastname}} </td>
+      <td><div class='btn btn-outline-info'>
         <a href="{{ url_for('SeeTeam', variable=post.id) }}">Zobacz skład</a>
-      </div>
-      <div class='btn btn-outline-warning'>
+      </div> </td>
+      <td> <div class='btn btn-outline-warning'>
         <a href="{{ url_for('EditTeam', variable=post.id) }}">Edytuj drużynę</a>
-      </div>
-      <div class='btn btn-outline-danger'>
+      </div> </td>
+      <td> <div class='btn btn-outline-danger'>
       <a href="{{ url_for('AddTeam') }}">Usuń drużynę</a>
-      </div>
+      </div> </td>
+      </tr>
     {% endfor %}
-    <p>
-
-
-
-    </p>
+    </tbody>
+  </table>
   <div class='btn btn-outline-info'>
     <a href="{{ url_for('AddTeam') }}">Dodaj drużynę</a>
   </div>
   {% endblock content %}
+
+  {% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#teams').DataTable({
+        columns: [
+          null,
+          {searchable: false},
+          {orderable: false, searchable: false},
+          {orderable: false, searchable: false},
+          null,null,null],
+      });
+    });
+  </script>
+{% endblock %}

@@ -160,9 +160,9 @@ def pobierz_gracza(connection, cursor, id):
     players = []
     for x in myresult:
         player = {'name': x[0],
-                 'last_name': x[1],
-                 'phone_number': x[2],
-                 }
+                  'last_name': x[1],
+                  'phone_number': x[2],
+                  }
 
         players.append(player)
     return players

@@ -14,6 +14,8 @@ History = [
     {
         'team1': 'temp',
         'team2': 'temp',
+        'team1_score': 'temp',
+        'team2_score': 'temp',
         'data_gry': 'temp2',
         'stadion': 'nasd'
     }
@@ -23,6 +25,17 @@ Stadiony = [
         'nazwa': 'cokolwiek',
         'adres': 'temp',
         'seats': 'temp2'
+    }
+]
+
+
+Trenerzy = [
+    {
+        'name': 'cokolwiek',
+        'last_name': 'temp',
+        'phone': 'temp2',
+        'nationality': 'poland',
+        'team_name': 'Lech'
     }
 ]
 
@@ -58,6 +71,12 @@ def players():
     Gracze = pobierz_zawodnikow(connection, cursor)
     odlacz(cursor, connection)
     return render_template('players.html', title="Gracze", posts=Gracze)
+
+
+@app.route('/coaches')
+def coaches():
+    trenerzy = Trenerzy
+    return render_template('coaches.html', title="Trenerzy", posts=trenerzy)
 
 
 @app.route('/seasons', methods=['GET', 'POST'])
@@ -150,6 +169,26 @@ def EditTeam(variable):
 
 @app.route('/teams/squad/edit/<int:variable>', methods=['GET', 'POST'])
 def EditSquad(variable):
+    connection, cursor = polaczenie()
+    Druzyny = pobierz_sklad(connection, cursor, variable)
+    form = EditSquadForm()
+    if form.validate_on_submit():
+        flash(
+            'Drużyna została pomyślnie edytowana',
+            'success')
+        return redirect(url_for('SeeTeam', variable))
+    elif request.method == 'GET':
+        form.name1.data = Druzyny[0]['name']
+        form.last_name1.data = Druzyny[0]['last_name']
+        form.phone1.data = Druzyny[0]['phone_number']
+
+    return render_template('editsquad.html',
+                           title=f'Edycja {Druzyny[0]["team_name"]}',
+                           posts=Druzyny, variable=variable, form=form)
+
+
+@app.route('/players/edit/<int:variable>', methods=['GET', 'POST'])
+def EditPlayer(variable):
     connection, cursor = polaczenie()
     Druzyny = pobierz_sklad(connection, cursor, variable)
     form = EditSquadForm()

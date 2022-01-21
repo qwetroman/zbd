@@ -1,11 +1,52 @@
 {% extends "layout.html" %}
 {% block content %}
+<table id = "data" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+  <thead>
+      <tr>
+        <th class="th-sm">Imie i nazwisko
+        </th>
+        <th class="th-sm">Numer telefonu
+        </th>
+        <th class="th-sm">Drużyna
+        </th>
+        <th class="th-sm">Edutuj
+        </th>
+        <th class="th-sm">Usuń
+        </th>
+      </tr>
+  </thead>
+  <tbody>
     {% for post in posts %}
-      <h1> {{post.name}} {{post.last_name}} </h1>
-      <p> Numer telefonu: {{post.phone_number}} </p>
-      <p> Drużyna: {{post.team}} </p>
+    <tr>
+      <td> {{post.name}} {{post.last_name}} </td>
+      <td>  {{post.phone_number}} </td>
+      <td>  {{post.team}} </td>
+      <td> <div class='btn btn-outline-info'>
+        <a href="{{ url_for('AddPlayer') }}">Edytuj gracza</a>
+      </div> </td>
+      <td> <div class='btn btn-outline-info'>
+        <a href="{{ url_for('AddPlayer') }}">Usuń gracza</a>
+      </div> </td>
+    </tr>
     {% endfor %}
+  </tbody>
+</table>
   <div class='btn btn-outline-info'>
     <a href="{{ url_for('AddPlayer') }}">Dodaj gracza</a>
   </div>
   {% endblock content %}
+
+  {% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#data').DataTable({
+        columns: [
+          null,
+          {searchable: true},
+          {orderable: false, searchable: true},
+          {orderable: false, searchable: true},
+          null],
+      });
+    });
+  </script>
+{% endblock %}
