@@ -128,3 +128,48 @@ def pobierz_sezony(connection, cursor):
 
         seasons.append(season)
     return seasons
+def transfer_player(connection, cursor, player_id,out_team,in_team,cost):
+    komenda = ("call transfer_player(%s,%s,%s,%s);")
+    komenda1 = ("Select number_of_players from football_team where team_id = %s ;")
+    komenda2 = ("Select balance from  where team_id = out_team ;;")
+    cursor.execute(komenda1,int(out_team));
+    myresult = cursor.fetchall()
+    if(int(myresult[0][0])<=23):
+        return("Selling team do not have enough players!")
+    cursor.execute(komenda2, int(cost));
+    myresult = cursor.fetchall()
+    if (int(myresult[0][0]) <= 23):
+        return ("Selling team do not have enough players!")
+
+
+    cursor.execute(komenda,int(player_id),int(out_team),int(in_team),int(cost))
+    # cursor.execute(komenda)
+
+    myresult = cursor.fetchall()
+    seasons = []
+    for x in myresult:
+        season = {'name': x[2],
+                  'country': x[1],
+                  'beggining': x[3],
+                  'end': x[4],
+                  'id': x[0]
+                  }
+
+        seasons.append(season)
+    return seasons
+def pobierz_gracza(connection, cursor, id):
+    komenda = ("SELECT first_name,last_name,phone_number FROM PLAYERS where players.player_id = %s;")
+
+    cursor.execute(komenda, (int(id),))
+    # cursor.execute(komenda)
+
+    myresult = cursor.fetchall()
+    players = []
+    for x in myresult:
+        player = {'name': x[0],
+                 'last_name': x[1],
+                 'phone_number': x[2],
+                 }
+
+        players.append(player)
+    return players
