@@ -22,7 +22,7 @@
       <td>  {{post.phone_number}} </td>
       <td>  {{post.team}} </td>
       <td> <div class='btn btn-outline-info'>
-        <a href="{{ url_for('AddPlayer') }}">Edytuj gracza</a>
+        <a href="{{ url_for('EditPlayer',variable = post.id) }}">Edytuj gracza</a>
       </div> </td>
       <td> <div class='btn btn-outline-info'>
         <a href="{{ url_for('AddPlayer') }}">Usuń gracza</a>

@@ -62,6 +62,13 @@ class AddPlayerForm(FlaskForm):
     submit = SubmitField("Dodaj zawodnika")
 
 
+class EditPlayerForm(FlaskForm):
+    name = StringField("Imię gracza", [DataRequired()])
+    last_name = StringField("Nazwisko gracza", [DataRequired()])
+    phone = StringField("Phone number", [DataRequired()])
+    submit = SubmitField("Edytuj zawodnika")
+
+
 class AddSeasonForm(FlaskForm):
     name = StringField("Nazwa sezonu", [DataRequired()])
     country = StringField("Kraj", [DataRequired()])

@@ -54,7 +54,7 @@ def pobierz_druzyny(connection, cursor):
 
 
 def pobierz_zawodnikow(connection, cursor):
-    komenda = ("SELECT first_name, last_name,phone_number, team_name from players inner join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
+    komenda = ("SELECT first_name, last_name,phone_number, team_name, player_id from players inner join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
 
     cursor.execute(komenda)
 
@@ -64,7 +64,8 @@ def pobierz_zawodnikow(connection, cursor):
         player = {'name': x[0],
                   'last_name': x[1],
                   'phone_number': x[2],
-                  'team': x[3]}
+                  'team': x[3],
+                  'id': x[4]}
 
         players.append(player)
     return players
@@ -164,7 +165,7 @@ def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
 
 def pobierz_gracza(connection, cursor, id):
     komenda = (
-        "SELECT first_name,last_name,phone_number FROM PLAYERS where players.player_id = %s;")
+        "SELECT first_name,last_name,phone_number, player_id FROM PLAYERS where players.player_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -175,6 +176,7 @@ def pobierz_gracza(connection, cursor, id):
         player = {'name': x[0],
                   'last_name': x[1],
                   'phone_number': x[2],
+                  'id': x[3]
                   }
 
         players.append(player)
