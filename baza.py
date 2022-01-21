@@ -129,36 +129,29 @@ def pobierz_sezony(connection, cursor):
         seasons.append(season)
     return seasons
 def transfer_player(connection, cursor, player_id,out_team,in_team,cost):
-    komenda = ("call transfer_player(%s,%s,%s,%s);")
-    komenda1 = ("Select number_of_players from football_team where team_id = %s ;")
-    komenda2 = ("Select balance from  where team_id = out_team ;;")
+    komenda = "call transfer_player(%s,%s,%s,%s);"
+    komenda1 = "Select number_of_players from football_team where team_id = %s ;"
+    komenda2 = "Select balance from budget inner join football_team on budget.budget_id=football_team.budget_id  " \
+               "where football_team.team_id = %s ; "
     cursor.execute(komenda1,int(out_team));
     myresult = cursor.fetchall()
-    if(int(myresult[0][0])<=23):
-        return("Selling team do not have enough players!")
-    cursor.execute(komenda2, int(cost));
+    flaga=0
+    if int(myresult[0][0])<=23:
+        flaga=1
+        return "Selling team do not have enough players!"
+    cursor.execute(komenda2, int(in_team));
     myresult = cursor.fetchall()
-    if (int(myresult[0][0]) <= 23):
-        return ("Selling team do not have enough players!")
+    if int(myresult[0][0]) < int(cost):
+        flaga=1
+        return "Buying team do not have enough money!"
 
-
-    cursor.execute(komenda,int(player_id),int(out_team),int(in_team),int(cost))
+    if flaga==0:
+        cursor.execute(komenda,int(player_id),int(out_team),int(in_team),int(cost))
+        return 0
     # cursor.execute(komenda)
 
-    myresult = cursor.fetchall()
-    seasons = []
-    for x in myresult:
-        season = {'name': x[2],
-                  'country': x[1],
-                  'beggining': x[3],
-                  'end': x[4],
-                  'id': x[0]
-                  }
-
-        seasons.append(season)
-    return seasons
 def pobierz_gracza(connection, cursor, id):
-    komenda = ("SELECT first_name,last_name,phone_number FROM PLAYERS where players.player_id = %s;")
+    komenda = "SELECT first_name,last_name,phone_number FROM PLAYERS where players.player_id = %s;"
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
