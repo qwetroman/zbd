@@ -5,7 +5,6 @@
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
           <legend class = "border bottom mb-4"> Dodawanie gry </legend>
-
           <div class="form group">
             {{ form.TeamO.label(class="form-control-label") }}
 
@@ -35,7 +34,14 @@
                         {{ form.TeamT(class="form-control form-control-lg") }}
                     {% endif %}
           </div>
-
+          <div class="form group">
+            {{ form.PointsO.label(class="form-control-label") }}
+            {{ form.PointsO(class="form-control form-control-lg") }}
+          </div>
+          <div class="form group">
+            {{ form.PointsT.label(class="form-control-label") }}
+            {{ form.PointsT(class="form-control form-control-lg") }}
+          </div>
           <div class="form group">
             {{ form.StadionName.label(class="form-control-label") }}
 

@@ -60,6 +60,7 @@ def pobierz_zawodnikow(connection, cursor):
 
     myresult = cursor.fetchall()
     players = []
+    print(myresult)
     for x in myresult:
         player = {'name': x[0],
                   'last_name': x[1],
@@ -131,22 +132,10 @@ def pobierz_sezony(connection, cursor):
     return seasons
 
 
-def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
-    komenda = ("call transfer_player(%s,%s,%s,%s);")
-    komenda1 = (
-        "Select number_of_players from football_team where team_id = %s ;")
-    komenda2 = ("Select balance from  where team_id = out_team ;;")
-    cursor.execute(komenda1, int(out_team))
-    myresult = cursor.fetchall()
-    if(int(myresult[0][0]) <= 23):
-        return("Selling team do not have enough players!")
-    cursor.execute(komenda2, int(cost))
-    myresult = cursor.fetchall()
-    if (int(myresult[0][0]) <= 23):
-        return ("Selling team do not have enough players!")
+def pobierz_sezon(connection, cursor, id):
+    komenda = ("SELECT * FROM SEASON where season_id = %s;")
 
-    cursor.execute(komenda, int(player_id), int(
-        out_team), int(in_team), int(cost))
+    cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
 
     myresult = cursor.fetchall()
@@ -161,6 +150,33 @@ def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
 
         seasons.append(season)
     return seasons
+
+
+def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
+    komenda = "call transfer_player(%s,%s,%s,%s);"
+    komenda1 = "Select number_of_players from football_team where team_id = %s ;"
+    komenda2 = "Select balance from budget inner join football_team on budget.budget_id=football_team.budget_id  " \
+               "where football_team.team_id = %s ; "
+    data = (int(out_team))
+    cursor.execute(komenda1, data)
+    connection.commit()
+    myresult = cursor.fetchall()
+    flaga = 0
+    if int(myresult[0][0]) <= 23:
+        flaga = 1
+        return "Selling team do not have enough players!"
+    cursor.execute(komenda2, int(in_team))
+    myresult = cursor.fetchall()
+    if int(myresult[0][0]) < int(cost):
+        flaga = 1
+        return "Buying team do not have enough money!"
+
+    if flaga == 0:
+        data = (int(player_id), int(out_team), int(in_team), int(cost))
+        cursor.execute(komenda, data)
+        connection.commit()
+        return 0
+    # cursor.execute(komenda)
 
 
 def pobierz_gracza(connection, cursor, id):
@@ -181,3 +197,107 @@ def pobierz_gracza(connection, cursor, id):
 
         players.append(player)
     return players
+
+
+def pobierz_gre(connection, cursor, id):
+    komenda = ("select * from match_history where match_id = %s;")
+
+
+def add_team(connection, cursor, name, season, adress, capacity, manager_name, manager_surname,
+             manager_phone, balance, debt, profit, expenses):
+    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+    komenda1 = "select season_id from season where season_name = %s"
+    cursor.execute(komenda1, (season,))
+    myresult = cursor.fetchall()
+    season_id = myresult[0][0]
+    data = (name, season_id, adress, capacity, manager_name, manager_surname,
+            manager_phone, balance, debt, profit, expenses)
+    cursor.execute(komenda, data)
+    connection.commit()
+    return 0
+
+
+def add_player(connection, cursor, name, surname, phone, team):
+    komenda = "call add_player(%s,%s,%s,%s);"
+    komenda1 = "select team_id from football_team where team_name = %s"
+    cursor.execute(komenda1, team)
+    myresult = cursor.fetchall()
+    team_id = myresult[0][0]
+    data = (name, surname, phone, team_id)
+    cursor.execute(komenda, data)
+    connection.commit()
+    return 0
+
+
+def pobierz_nazwy_druzyn():
+    connection, cursor = polaczenie()
+    komenda = "SELECT TEAM_NAME FROM FOOTBALL_TEAM"
+    cursor.execute(komenda)
+    result = cursor.fetchall()
+    teams = []
+    for x in result:
+        teams.append(x[0])
+    odlacz(connection, cursor)
+    return teams
+
+
+def pobierz_stadiony(connection, cursor):
+    komenda = ("SELECT * FROM STADION;")
+
+    cursor.execute(komenda)
+    # cursor.execute(komenda)
+
+    myresult = cursor.fetchall()
+    stadiums = []
+    for x in myresult:
+        stadium = {'id': x[0],
+                   'address': x[1],
+                   'capacity': x[2],
+                   'name': x[3]
+                   }
+
+        stadiums.append(stadium)
+    return stadiums
+
+
+def pobierz_stadion(connection, cursor, id):
+    komenda = ("SELECT * FROM STADION where stadion_id = %s;")
+    cursor.execute(komenda, (int(id),))
+    myresult = cursor.fetchall()
+    stadiums = []
+    for x in myresult:
+        stadium = {'id': x[0],
+                   'address': x[1],
+                   'capacity': x[2],
+                   'name': x[3]
+                   }
+
+        stadiums.append(stadium)
+    return stadiums
+
+
+def delete_stadium(id):
+    connection, cursor = polaczenie()
+    komenda = "Delete from STADION where stadion_id=%s;"
+    cursor.execute(komenda, (int(id),))
+    connection.commit()
+    odlacz(cursor, connection)
+    return 0
+
+
+def create_stadium(address, capacity, name):
+    connection, cursor = polaczenie()
+    komenda = "insert into stadion(adress,number_of_sits,name) values (%s,%s,%s);"
+    data = (address, capacity, name)
+    cursor.execute(komenda, data)
+    connection.commit()
+    return 0
+
+
+def update_stadium(connection, cursor, id, address, capacity, name):
+    komenda = "update stadion SET adress=%s,number_of_sits=%s,name=%s where stadion_id=%s;"
+    data = (address, capacity, name, id)
+    cursor.execute(komenda, data)
+    connection.commit()
+    # cursor.execute(komenda, address, capacity, name, id)
+    return 0

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content section">
+      <form method = "POST" action ="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+          <legend class = "border bottom mb-4"> Dodawanie stadionu </legend>
+          <div class="form group">
+            {{ form.Druzyny.label(class="form-control-label") }}
+            {{ form.Druzyny(class="form-control form-control-lg") }}
+          </div>
+          <div class="form group">
+            {{ form.Koszt.label(class="form-control-label") }}
+            {{ form.Koszt(class="form-control form-control-lg") }}
+          </div>
+
+        </fieldset>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+      </form>
+    </div>
+    {% endblock content %}

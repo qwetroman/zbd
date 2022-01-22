@@ -25,10 +25,10 @@
       <td> {{post.beggining}} </td>
       <td> {{ post.end }} </td>
       <td><div class='btn btn-outline-warning'>
-        <a href="{{ url_for('home') }}">Edytuj sezon</a>
+        <a href="{{ url_for('EditSeason',variable=post.id) }}">Edytuj sezon</a>
       </div></td>
       <td><div class='btn btn-outline-danger'>
-        <a href="{{ url_for('home') }}">Usuń sezon</a>
+        <a href="{{ url_for('EditSeason', variable = post.id) }}">Usuń sezon</a>
       </div></td>
     </tr>
     {% endfor %}

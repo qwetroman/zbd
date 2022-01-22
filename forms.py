@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, DateField
-from wtforms.validators import DataRequired, Length, NumberRange, Optional
+from wtforms import StringField, IntegerField, SubmitField, DateField, SelectField
+from wtforms.validators import DataRequired, Length, NumberRange, Optional, NoneOf
+from baza import pobierz_nazwy_druzyn
 
 
 class AddTeamForm(FlaskForm):
@@ -37,8 +38,14 @@ class AddTeamForm(FlaskForm):
 
 
 class AddGameForm(FlaskForm):
-    TeamO = StringField("Nazwa druzyny 1", [DataRequired(), Length(min=2)])
-    TeamT = StringField("Nazwa druzyny 2", [DataRequired(), Length(min=2)])
+
+    teams = pobierz_nazwy_druzyn()
+    TeamO = SelectField(u'Drużyna 1', choices=teams,
+                        validators=[DataRequired()])
+    TeamT = SelectField(u'Drużyna 2', choices=teams,
+                        validators=[DataRequired()])
+    PointsO = IntegerField("Punkty drużyny 1", [DataRequired()])
+    PointsT = IntegerField("Punkty drużyny 2", [DataRequired()])
     StadionName = StringField(
         "Nazwa stadionu", [DataRequired(), Length(min=2)])
     GameDate = DateField(
@@ -51,14 +58,21 @@ class AddStadionForm(FlaskForm):
     adres = StringField("Adres stadionu", [DataRequired()])
     seats = IntegerField(
         'Ilośc siedzeń', [DataRequired(), NumberRange(min=1)])
-    submit = SubmitField("Dodaj stadion")
+    submit = SubmitField("Zatwierdź")
+
+
+class DeleteStadionForm(FlaskForm):
+    submit = SubmitField("Usuń")
 
 
 class AddPlayerForm(FlaskForm):
+    teams = pobierz_nazwy_druzyn()
+    teams.append('Brak drużyny')
     name = StringField("Imię gracza", [DataRequired()])
     lastname = StringField("Nazwisko gracza", [DataRequired()])
     phone = StringField("Phone number", [DataRequired()])
-    team = StringField("Drużyna (opcjonalne)")
+    team = SelectField("Drużyna (opcjonalne)", choices=teams,
+                       validators=[DataRequired()])
     submit = SubmitField("Dodaj zawodnika")
 
 
@@ -74,7 +88,7 @@ class AddSeasonForm(FlaskForm):
     country = StringField("Kraj", [DataRequired()])
     beggining = DateField("Początek", [DataRequired()])
     end = DateField("Koniec", [DataRequired()])
-    submit = SubmitField("Dodaj stadion")
+    submit = SubmitField("Edytuj sezon")
 
 
 class EditTeamForm(FlaskForm):
@@ -107,6 +121,16 @@ class EditTeamForm(FlaskForm):
         'Wydatki drużyny')
 
     submit = SubmitField("Edytuj drużynę")
+
+
+class TransferForm(FlaskForm):
+    teams = pobierz_nazwy_druzyn()
+    teams.append('Wyrzuc zawodnika z druzyny')
+    Druzyny = SelectField("Drużyna do ktorej gracz zostanie przeniesiony",
+                          choices=teams, validators=[DataRequired()])
+    Koszt = IntegerField("Koszt transferu", [
+                         DataRequired(), NumberRange(min=0)])
+    submit = SubmitField("Dokonaj transferu")
 
 
 class EditSquadForm(FlaskForm):

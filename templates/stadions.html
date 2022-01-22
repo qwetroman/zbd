@@ -5,7 +5,7 @@
     <tr>
       <th class="th-sm">Nazwa
       </th>
-      <th class="th-sm">adres
+      <th class="th-sm">Adres
       </th>
       <th class="th-sm">Ilośc miejsc
       </th>
@@ -18,14 +18,14 @@
   <tbody>
     {% for post in posts %}
     <tr>
-      <td> {{post.nazwa}} </td>
-      <td> {{post.adres}} </td>
-      <td> {{post.seats}} </td>
+      <td> {{post.name}} </td>
+      <td> {{post.address}} </td>
+      <td> {{post.capacity}} </td>
       <td><div class='btn btn-outline-warning'>
-        <a href="{{ url_for('AddStadion') }}">Edytuj stadion</a>
+        <a href="{{ url_for('EditStadion', variable = post.id) }}">Edytuj stadion</a>
       </div></td>
       <td><div class='btn btn-outline-danger'>
-        <a href="{{ url_for('about') }}">Usuń stadion</a>
+        <a href="{{ url_for('DeleteStadion', variable = post.id) }}">Usuń stadion</a>
       </div></td>
     </tr>
     {% endfor %}

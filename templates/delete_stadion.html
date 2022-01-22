@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1> Czy na pewno chcesz usunąc stadion? </h1>
+    <div class="content section">
+      <form method = "POST" action ="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+      </form>
+      <div class='btn btn-outline-warning'>
+        <a href="{{ url_for('stadions') }}">Wroc</a>
+      </div>
+    </div>
+    {% endblock content %}
