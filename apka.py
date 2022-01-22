@@ -1,8 +1,9 @@
 from flask import Flask, render_template, flash, redirect, url_for, request
 from forms import (AddTeamForm, AddGameForm, AddStadionForm, AddPlayerForm,
-                   EditTeamForm, AddSeasonForm, EditSquadForm)
+                   EditTeamForm, AddSeasonForm, EditSquadForm, EditPlayerForm)
 from baza import (polaczenie, odlacz, pobierz_druzyny, pobierz_zawodnikow,
-                  pobierz_druzyny_do_edycji, pobierz_sklad, pobierz_sezony)
+                  pobierz_druzyny_do_edycji, pobierz_sklad, pobierz_sezony,
+                  pobierz_gracza)
 # import mysql.connector
 # from mysql.connector import Error
 
@@ -190,21 +191,21 @@ def EditSquad(variable):
 @app.route('/players/edit/<int:variable>', methods=['GET', 'POST'])
 def EditPlayer(variable):
     connection, cursor = polaczenie()
-    Druzyny = pobierz_sklad(connection, cursor, variable)
-    form = EditSquadForm()
+    gracz = pobierz_gracza(connection, cursor, variable)
+    form = EditPlayerForm()
     if form.validate_on_submit():
         flash(
-            'Drużyna została pomyślnie edytowana',
+            'Gracz został pomyślnie edytowany',
             'success')
-        return redirect(url_for('SeeTeam', variable))
+        return redirect(url_for('players', variable))
     elif request.method == 'GET':
-        form.name1.data = Druzyny[0]['name']
-        form.last_name1.data = Druzyny[0]['last_name']
-        form.phone1.data = Druzyny[0]['phone_number']
+        form.name.data = gracz[0]['name']
+        form.last_name.data = gracz[0]['last_name']
+        form.phone.data = gracz[0]['phone_number']
 
-    return render_template('editsquad.html',
-                           title=f'Edycja {Druzyny[0]["team_name"]}',
-                           posts=Druzyny, variable=variable, form=form)
+    return render_template('editplayer.html',
+                           title=f'Edycja {gracz[0]["name"]}',
+                           posts=gracz, variable=variable, form=form)
 
 
 @app.route('/teams/see<int:variable>')
