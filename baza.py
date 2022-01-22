@@ -169,16 +169,22 @@ def pobierz_stadiony():
 
 def delete_stadium(id):
     connection, cursor = polaczenie()
-    komenda = "Delete from STADION where stadion_id=%s;"
-    cursor.execute(komenda, (id,))
-    odlacz(cursor, connection)
-    return 0
+    komenda1 = "select * from football_team where stadion_id=%s;"
+    cursor.execute(komenda1, id)
+    myresult = cursor.fetchall()
+    if myresult[0][0] != 'NULL':
+        return "This stadium is occupied by team"
+    else:
+        komenda = "Delete from STADION where stadion_id=%s;"
+        cursor.execute(komenda, (id,))
+        odlacz(cursor, connection)
+        return 0
 
 
 def create_stadium(address, capacity, name):
     connection, cursor = polaczenie()
     komenda = "insert into stadion(address,number_of_seats,name) values (%s,%s,%s);"
-    data=(address,capacity,name)
+    data = (address, capacity, name)
     cursor.execute(komenda, data);
     odlacz(cursor, connection)
     return 0
@@ -187,7 +193,7 @@ def create_stadium(address, capacity, name):
 def update_stadium(id, address, capacity, name):
     connection, cursor = polaczenie()
     komenda = "update stadion SET address=%s,number_of_seats=%s,name=%s where stadion_id=%s;"
-    data=(id, address, capacity, name)
+    data = (id, address, capacity, name)
     cursor.execute(komenda, data);
     odlacz(cursor, connection)
     return 0
@@ -306,19 +312,93 @@ def delete_coach(id):
     return 0
 
 
-def create_coach(first_name,last_name,phone_number,nationality):
+def create_coach(first_name, last_name, phone_number, nationality):
     connection, cursor = polaczenie()
     komenda = "insert into coach(first_name,last_name,phone_number,nationality) values (%s,%s,%s,%s);"
-    data=(first_name,last_name,phone_number,nationality)
+    data = (first_name, last_name, phone_number, nationality)
     cursor.execute(komenda, data);
     odlacz(cursor, connection)
     return 0
 
 
-def update_coach(first_name,last_name,phone_number,nationality):
+def update_coach(first_name, last_name, phone_number, nationality):
     connection, cursor = polaczenie()
     komenda = "update stadion SET address=%s,number_of_seats=%s,name=%s where stadion_id=%s;"
-    data=(first_name,last_name,phone_number,nationality)
-    cursor.execute(komenda, first_name,last_name,phone_number,nationality);
+    data = (first_name, last_name, phone_number, nationality)
+    cursor.execute(komenda, first_name, last_name, phone_number, nationality);
     odlacz(cursor, connection)
+    return 0
+
+
+def pobierz_fizio():
+    connection, cursor = polaczenie()
+
+    komenda = (
+
+        "SELECT physios_id,first_name,last_name,phone_number,physios_type,player_id,last_name FROM physios left join "
+        "players on physios.player_id=players.player_id")
+    cursor.execute(komenda)
+    myresult = cursor.fetchall()
+    physios = []
+
+    for x in myresult:
+        physio = {'id': x[0],
+
+                  'Name': x[1],
+
+                  'Surname': x[2],
+
+                  'Phone number': x[3],
+
+                  'Type': x[4],
+
+                  'Employer': x[-1]
+
+                  }
+
+        physios.append(physio)
+
+        odlacz(cursor, connection)
+
+    return physios
+
+
+def delete_physio(id):
+    connection, cursor = polaczenie()
+
+    komenda = "Delete from physios where physios_id=%s;"
+
+    cursor.execute(komenda, (id,))
+
+    odlacz(cursor, connection)
+
+    return 0
+
+
+def create_physio(first_name, last_name, phone_number, physios_type):
+    connection, cursor = polaczenie()
+
+    komenda = "insert into physios(first_name,last_name,phone_number,physios_type) values (%s,%s,%s,%s);"
+
+    data = (first_name, last_name, phone_number, physios_type)
+
+    cursor.execute(komenda, data);
+
+    odlacz(cursor, connection)
+
+    return 0
+
+
+def update_physios(physio_id,first_name, last_name, phone_number, physios_type, player_id):
+    connection, cursor = polaczenie()
+
+    komenda = "update physios SET first_name=%s,last_name=%s,phone_number=%s,physios_type=%s,player_id=%s where " \
+              "physios_id=%s; "
+
+    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
+
+    cursor.execute(komenda, data);
+
+    odlacz(cursor, connection)
+
     return 0
