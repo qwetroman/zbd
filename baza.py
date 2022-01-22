@@ -179,7 +179,9 @@ def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
     komenda1 = "Select number_of_players from football_team where team_id = %s ;"
     komenda2 = "Select balance from budget inner join football_team on budget.budget_id=football_team.budget_id  " \
                "where football_team.team_id = %s ; "
-    cursor.execute(komenda1, int(out_team));
+    data=(int(out_team))
+    cursor.execute(komenda1, data);
+    connection.commit()
     myresult = cursor.fetchall()
     flaga = 0
     if int(myresult[0][0]) <= 23:
@@ -192,7 +194,9 @@ def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
         return "Buying team do not have enough money!"
 
     if flaga == 0:
-        cursor.execute(komenda, int(player_id), int(out_team), int(in_team), int(cost))
+        data=(int(player_id), int(out_team), int(in_team), int(cost))
+        cursor.execute(komenda, data)
+        connection.commit()
         return 0
     # cursor.execute(komenda)
 
@@ -221,11 +225,13 @@ def add_team(connection, cursor, name, season, adress, capacity, manager_name, m
              manager_phone, balance, debt, profit, expenses):
     komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
     komenda1 = "select season_id from season where season_name = %s"
-    cursor.execute(komenda1, season)
+    cursor.execute(komenda1, (season,))
     myresult = cursor.fetchall()
     season_id = myresult[0][0]
-    cursor.execute(komenda, name, season_id, adress, capacity, manager_name, manager_surname,
-                   manager_phone, balance, debt, profit, expenses);
+    data=(name, season_id, adress, capacity, manager_name, manager_surname,
+                   manager_phone, balance, debt, profit, expenses)
+    cursor.execute(komenda,data );
+    connection.commit()
     return 0
 
 
@@ -235,5 +241,7 @@ def add_player(connection, cursor, name, surname, phone, team):
     cursor.execute(komenda1, team)
     myresult = cursor.fetchall()
     team_id = myresult[0][0]
-    cursor.execute(komenda, name, surname, phone, team_id);
+    data=(name, surname, phone, team_id)
+    cursor.execute(komenda, data);
+    connection.commit()
     return 0
