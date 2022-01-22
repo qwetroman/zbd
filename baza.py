@@ -177,10 +177,13 @@ def pobierz_gracza(connection, cursor, id):
     return players
 
 
-def add_team(connection, cursor, name, country, begin, end, adress, capacity, manager_name, manager_surname,
+def add_team(connection, cursor, name, season, adress, capacity, manager_name, manager_surname,
              manager_phone, balance, debt, profit, expenses):
-    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-
-    cursor.execute(komenda, name, country, begin, end, adress, capacity, manager_name, manager_surname,
+    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+    komenda1 = "select season_id from season hwere season_name = %s"
+    cursor.execute(komenda1,season)
+    myresult=cursor.fetchall()
+    season_id= myresult[0][0]
+    cursor.execute(komenda, name, season_id, adress, capacity, manager_name, manager_surname,
              manager_phone, balance, debt, profit, expenses);
     return 0
