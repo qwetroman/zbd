@@ -35,7 +35,8 @@ def odlacz(cursor, connection):
 
 
 def pobierz_druzyny(connection, cursor):
-    komenda = ("SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
+    komenda = (
+        "SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
 
     cursor.execute(komenda)
 
@@ -54,7 +55,8 @@ def pobierz_druzyny(connection, cursor):
 
 
 def pobierz_zawodnikow(connection, cursor):
-    komenda = ("SELECT first_name, last_name,phone_number, team_name from players inner join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
+    komenda = (
+        "SELECT first_name, last_name,phone_number, team_name from players inner join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
 
     cursor.execute(komenda)
 
@@ -71,7 +73,8 @@ def pobierz_zawodnikow(connection, cursor):
 
 
 def pobierz_druzyny_do_edycji(connection, cursor, id):
-    komenda = ("SELECT team_id,team_name,number_of_players,first_name,last_name FROM football_team inner join team_menager on team_menager.manager_id=football_team.manager_id where team_id = %s;")
+    komenda = (
+        "SELECT team_id,team_name,number_of_players,first_name,last_name FROM football_team inner join team_menager on team_menager.manager_id=football_team.manager_id where team_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -91,7 +94,8 @@ def pobierz_druzyny_do_edycji(connection, cursor, id):
 
 
 def pobierz_sklad(connection, cursor, id):
-    komenda = ("SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name FROM PLAYERS INNER JOIN FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
+    komenda = (
+        "SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name FROM PLAYERS INNER JOIN FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -128,27 +132,30 @@ def pobierz_sezony(connection, cursor):
 
         seasons.append(season)
     return seasons
-def transfer_player(connection, cursor, player_id,out_team,in_team,cost):
+
+
+def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
     komenda = "call transfer_player(%s,%s,%s,%s);"
     komenda1 = "Select number_of_players from football_team where team_id = %s ;"
     komenda2 = "Select balance from budget inner join football_team on budget.budget_id=football_team.budget_id  " \
                "where football_team.team_id = %s ; "
-    cursor.execute(komenda1,int(out_team));
+    cursor.execute(komenda1, int(out_team));
     myresult = cursor.fetchall()
-    flaga=0
-    if int(myresult[0][0])<=23:
-        flaga=1
+    flaga = 0
+    if int(myresult[0][0]) <= 23:
+        flaga = 1
         return "Selling team do not have enough players!"
     cursor.execute(komenda2, int(in_team));
     myresult = cursor.fetchall()
     if int(myresult[0][0]) < int(cost):
-        flaga=1
+        flaga = 1
         return "Buying team do not have enough money!"
 
-    if flaga==0:
-        cursor.execute(komenda,int(player_id),int(out_team),int(in_team),int(cost))
+    if flaga == 0:
+        cursor.execute(komenda, int(player_id), int(out_team), int(in_team), int(cost))
         return 0
     # cursor.execute(komenda)
+
 
 def pobierz_gracza(connection, cursor, id):
     komenda = "SELECT first_name,last_name,phone_number FROM PLAYERS where players.player_id = %s;"
@@ -166,3 +173,12 @@ def pobierz_gracza(connection, cursor, id):
 
         players.append(player)
     return players
+
+
+def add_team(connection, cursor, name, country, begin, end, adress, capacity, manager_name, manager_surname,
+             manager_phone, balance, debt, profit, expenses):
+    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
+
+    cursor.execute(komenda, name, country, begin, end, adress, capacity, manager_name, manager_surname,
+             manager_phone, balance, debt, profit, expenses);
+    return 0
