@@ -55,7 +55,8 @@ def pobierz_druzyny(connection, cursor):
 
 
 def pobierz_zawodnikow(connection, cursor):
-    komenda = ("SELECT first_name, last_name,phone_number, team_name, player_id from players inner join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
+    komenda = (
+        "SELECT first_name, last_name,phone_number, team_name, player_id from players inner join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
 
     cursor.execute(komenda)
 
@@ -133,6 +134,37 @@ def pobierz_sezony(connection, cursor):
         seasons.append(season)
     return seasons
 
+def pobierz_stadiony(connection, cursor):
+    komenda = ("SELECT * FROM STADION ORDER BY BEGGINING;")
+
+    cursor.execute(komenda)
+    # cursor.execute(komenda)
+
+    myresult = cursor.fetchall()
+    stadiums = []
+    for x in myresult:
+        stadium = {'id': x[0],
+                  'address': x[1],
+                  'Capacity': x[2],
+                   'Name':x[3]
+                  }
+
+        stadiums.append(stadium)
+    return stadium
+
+def delete_stadium(connection,cursor,id):
+    komenda = "Delete from STADION where stadion_id=%s;"
+    cursor.execute(komenda,id)
+    return 0
+def create_stadium(connection,cursor,address,capacity,name ):
+    komenda ="insert into stadion(address,number_of_seats,name) values (%s,%s,%s);"
+    cursor.execute(komenda,address,capacity,name);
+    return 0
+def update_stadium(connection,cursor,id,address,capacity,name ):
+    komenda ="update stadion SET address=%s,number_of_seats=%s,name=%s where stadion_id=%s;"
+    cursor.execute(komenda,address,capacity,name,id);
+    return 0
+
 
 def transfer_player(connection, cursor, player_id, out_team, in_team, cost):
     komenda = "call transfer_player(%s,%s,%s,%s);"
@@ -181,9 +213,19 @@ def add_team(connection, cursor, name, season, adress, capacity, manager_name, m
              manager_phone, balance, debt, profit, expenses):
     komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
     komenda1 = "select season_id from season where season_name = %s"
-    cursor.execute(komenda1,season)
-    myresult=cursor.fetchall()
-    season_id= myresult[0][0]
+    cursor.execute(komenda1, season)
+    myresult = cursor.fetchall()
+    season_id = myresult[0][0]
     cursor.execute(komenda, name, season_id, adress, capacity, manager_name, manager_surname,
-             manager_phone, balance, debt, profit, expenses);
+                   manager_phone, balance, debt, profit, expenses);
+    return 0
+
+
+def add_player(connection, cursor, name, surname, phone, team):
+    komenda = "call add_player(%s,%s,%s,%s);"
+    komenda1 = "select team_id from football_team where team_name = %s"
+    cursor.execute(komenda1, team)
+    myresult = cursor.fetchall()
+    team_id = myresult[0][0]
+    cursor.execute(komenda, name, surname,phone,team_id);
     return 0
