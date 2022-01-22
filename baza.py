@@ -180,7 +180,7 @@ def pobierz_gracza(connection, cursor, id):
 def add_team(connection, cursor, name, season, adress, capacity, manager_name, manager_surname,
              manager_phone, balance, debt, profit, expenses):
     komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-    komenda1 = "select season_id from season hwere season_name = %s"
+    komenda1 = "select season_id from season where season_name = %s"
     cursor.execute(komenda1,season)
     myresult=cursor.fetchall()
     season_id= myresult[0][0]
