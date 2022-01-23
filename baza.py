@@ -419,7 +419,7 @@ def update_physios(physio_id, first_name, last_name, phone_number, physios_type,
 def pobierz_managera():
     connection, cursor = polaczenie()
     komenda = (
-        "SELECT manager_id,first_name,last_name,phone_number,team_name FROM team_menager left join "
+        "SELECT team_menager.manager_id,first_name,last_name,phone_number,team_name FROM team_menager left join "
 
         "football_team on team_menager.manager_id=football_team.manager_id")
     cursor.execute(komenda)
