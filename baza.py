@@ -369,7 +369,7 @@ def delete_physio(id):
     komenda = "Delete from physios where physios_id=%s;"
 
     cursor.execute(komenda, (id,))
-
+    connection.commit()
     odlacz(cursor, connection)
 
     return 0
@@ -383,7 +383,7 @@ def create_physio(first_name, last_name, phone_number, physios_type):
     data = (first_name, last_name, phone_number, physios_type)
 
     cursor.execute(komenda, data);
-
+    connection.commit()
     odlacz(cursor, connection)
 
     return 0
@@ -396,9 +396,8 @@ def update_physios(physio_id,first_name, last_name, phone_number, physios_type, 
               "physios_id=%s; "
 
     data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
-
     cursor.execute(komenda, data);
-
+    connection.commit()
     odlacz(cursor, connection)
 
     return 0
@@ -434,6 +433,7 @@ def delete_manager(id):
     connection, cursor = polaczenie()
     komenda = "Delete from team_menager where manager_id=%s;"
     cursor.execute(komenda, (id,))
+    connection.commit()
     odlacz(cursor, connection)
     return 0
 
@@ -443,17 +443,25 @@ def create_manager(first_name, last_name, phone_number):
     komenda = "insert into team_menager(first_name,last_name,phone_number) values (%s,%s,%s);"
     data = (first_name, last_name, phone_number)
     cursor.execute(komenda, data);
+    connection.commit()
     odlacz(cursor, connection)
     return 0
 
 
-def update_manager(first_name, last_name, phone_number, physios_type, player_id):
+#def update_manager(first_name, last_name, phone_number, physios_type, player_id):
+#    connection, cursor = polaczenie()
+#    komenda = "update physios SET first_name=%s,last_name=%s,phone_number=%s,physios_type=%s,player_id=%s where " \
+#
+#              "physios_id=%s; "
+#    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
+#    cursor.execute(komenda, data)
+#    connection.commit()
+#    odlacz(cursor, connection)
+#    return 0
+def free_player(id):
     connection, cursor = polaczenie()
-    komenda = "update physios SET first_name=%s,last_name=%s,phone_number=%s,physios_type=%s,player_id=%s where " \
-
-              "physios_id=%s; "
-    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
-    cursor.execute(komenda, data)
+    komenda= "call free_player(%s)"
+    cursor.execute(komenda,(id,))
     connection.commit()
-    odlacz(cursor, connection)
+    odlacz(cursor,connection)
     return 0
