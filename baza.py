@@ -37,7 +37,8 @@ def odlacz(cursor, connection):
 def pobierz_druzyny():
     connection, cursor = polaczenie()
     komenda = (
-        "SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
+        "SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join "
+        "team_menager on team_menager.manager_id = football_team.manager_id")
 
     cursor.execute(komenda)
 
@@ -59,7 +60,8 @@ def pobierz_druzyny():
 def pobierz_zawodnikow():
     connection, cursor = polaczenie()
     komenda = (
-        "SELECT first_name, last_name,phone_number, team_name, player_id from players left join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
+        "SELECT first_name, last_name,phone_number, team_name, player_id from players left join football_team on "
+        "players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
 
     cursor.execute(komenda)
 
@@ -81,7 +83,8 @@ def pobierz_zawodnikow():
 def pobierz_druzyny_do_edycji(id):
     connection, cursor = polaczenie()
     komenda = (
-        "SELECT team_id,team_name,number_of_players,first_name,last_name FROM football_team inner join team_menager on team_menager.manager_id=football_team.manager_id where team_id = %s;")
+        "SELECT team_id,team_name,number_of_players,first_name,last_name FROM football_team inner join team_menager "
+        "on team_menager.manager_id=football_team.manager_id where team_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -104,7 +107,8 @@ def pobierz_druzyny_do_edycji(id):
 def pobierz_sklad(id):
     connection, cursor = polaczenie()
     komenda = (
-        "SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name FROM PLAYERS INNER JOIN FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
+        "SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name FROM PLAYERS INNER JOIN "
+        "FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -126,7 +130,7 @@ def pobierz_sklad(id):
 
 def pobierz_sezony():
     connection, cursor = polaczenie()
-    komenda = ("SELECT * FROM SEASON ORDER BY BEGGINING;")
+    komenda = "SELECT * FROM SEASON ORDER BY BEGGINING;"
 
     cursor.execute(komenda)
     # cursor.execute(komenda)
@@ -148,7 +152,7 @@ def pobierz_sezony():
 
 def pobierz_stadiony():
     connection, cursor = polaczenie()
-    komenda = ("SELECT * FROM STADION ORDER BY BEGGINING;")
+    komenda = "SELECT * FROM STADION ORDER BY BEGGINING;"
 
     cursor.execute(komenda)
     # cursor.execute(komenda)
@@ -185,7 +189,7 @@ def create_stadium(address, capacity, name):
     connection, cursor = polaczenie()
     komenda = "insert into stadion(address,number_of_seats,name) values (%s,%s,%s);"
     data = (address, capacity, name)
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     odlacz(cursor, connection)
     return 0
 
@@ -194,7 +198,7 @@ def update_stadium(id, address, capacity, name):
     connection, cursor = polaczenie()
     komenda = "update stadion SET address=%s,number_of_seats=%s,name=%s where stadion_id=%s;"
     data = (id, address, capacity, name)
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     odlacz(cursor, connection)
     return 0
 
@@ -206,7 +210,7 @@ def transfer_player(player_id, out_team, in_team, cost):
     komenda2 = "Select balance from budget inner join football_team on budget.budget_id=football_team.budget_id  " \
                "where football_team.team_id = %s ; "
     data = (int(out_team))
-    cursor.execute(komenda1, data);
+    cursor.execute(komenda1, data)
     connection.commit()
     myresult = cursor.fetchall()
     flaga = 0
@@ -214,7 +218,7 @@ def transfer_player(player_id, out_team, in_team, cost):
         flaga = 1
         odlacz(cursor, connection)
         return "Selling team do not have enough players!"
-    cursor.execute(komenda2, int(in_team));
+    cursor.execute(komenda2, int(in_team))
     myresult = cursor.fetchall()
     if int(myresult[0][0]) < int(cost):
         flaga = 1
@@ -261,7 +265,7 @@ def add_team(name, season, adress, capacity, manager_name, manager_surname,
     season_id = myresult[0][0]
     data = (name, season_id, adress, capacity, manager_name, manager_surname,
             manager_phone, balance, debt, profit, expenses)
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     connection.commit()
     return 0
 
@@ -274,7 +278,7 @@ def add_player(name, surname, phone, team):
     myresult = cursor.fetchall()
     team_id = myresult[0][0]
     data = (name, surname, phone, team_id)
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     connection.commit()
     odlacz(cursor, connection)
     return 0
@@ -316,7 +320,7 @@ def create_coach(first_name, last_name, phone_number, nationality):
     connection, cursor = polaczenie()
     komenda = "insert into coach(first_name,last_name,phone_number,nationality) values (%s,%s,%s,%s);"
     data = (first_name, last_name, phone_number, nationality)
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     odlacz(cursor, connection)
     return 0
 
@@ -325,7 +329,7 @@ def update_coach(first_name, last_name, phone_number, nationality):
     connection, cursor = polaczenie()
     komenda = "update stadion SET address=%s,number_of_seats=%s,name=%s where stadion_id=%s;"
     data = (first_name, last_name, phone_number, nationality)
-    cursor.execute(komenda, first_name, last_name, phone_number, nationality);
+    cursor.execute(komenda, first_name, last_name, phone_number, nationality)
     odlacz(cursor, connection)
     return 0
 
@@ -382,28 +386,37 @@ def create_physio(first_name, last_name, phone_number, physios_type):
 
     data = (first_name, last_name, phone_number, physios_type)
 
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     connection.commit()
     odlacz(cursor, connection)
 
     return 0
 
+def get_player_id(name,surname,phone):
+    connection,cursor =polaczenie()
+    komenda = "select player_id form players where first_name =%s and last_name=% and phone_number =%s"
+    data=(name,surname,phone)
+    cursor.execute(komenda,data)
+    myresult=cursor.fetchall()
+    return myresult[0][0]
 
-def update_physios(physio_id,first_name, last_name, phone_number, physios_type, player_id):
+
+def update_physios(physio_id, first_name, last_name, phone_number, physios_type, player_name,player_surname,player_phone):
     connection, cursor = polaczenie()
+    player_id=get_player_id(player_name,player_surname,player_phone)
 
     komenda = "update physios SET first_name=%s,last_name=%s,phone_number=%s,physios_type=%s,player_id=%s where " \
               "physios_id=%s; "
 
-    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
-    cursor.execute(komenda, data);
+    data = (first_name, last_name, phone_number, physios_type, player_id, physio_id)
+    cursor.execute(komenda, data)
     connection.commit()
     odlacz(cursor, connection)
 
     return 0
 
-def pobierz_managera():
 
+def pobierz_managera():
     connection, cursor = polaczenie()
     komenda = (
         "SELECT manager_id,first_name,last_name,phone_number,team_name FROM team_menager left join "
@@ -413,20 +426,17 @@ def pobierz_managera():
     myresult = cursor.fetchall()
     managers = []
     for x in myresult:
-        if x[-1]=='NULL':
-            x[-1]='Not employed'
+        if x[-1] == 'NULL':
+            x[-1] = 'Not employed'
         manager = {'id': x[0],
-                  'Name': x[1],
-                  'Surname': x[2],
-                  'Phone number': x[3],
-                  'Employer': x[-1]
-                  }
+                   'Name': x[1],
+                   'Surname': x[2],
+                   'Phone number': x[3],
+                   'Employer': x[-1]
+                   }
         managers.append(manager)
         odlacz(cursor, connection)
     return managers
-
-
-
 
 
 def delete_manager(id):
@@ -442,13 +452,13 @@ def create_manager(first_name, last_name, phone_number):
     connection, cursor = polaczenie()
     komenda = "insert into team_menager(first_name,last_name,phone_number) values (%s,%s,%s);"
     data = (first_name, last_name, phone_number)
-    cursor.execute(komenda, data);
+    cursor.execute(komenda, data)
     connection.commit()
     odlacz(cursor, connection)
     return 0
 
 
-#def update_manager(first_name, last_name, phone_number, physios_type, player_id):
+# def update_manager(first_name, last_name, phone_number, physios_type, player_id):
 #    connection, cursor = polaczenie()
 #    komenda = "update physios SET first_name=%s,last_name=%s,phone_number=%s,physios_type=%s,player_id=%s where " \
 #
@@ -460,8 +470,8 @@ def create_manager(first_name, last_name, phone_number):
 #    return 0
 def free_player(id):
     connection, cursor = polaczenie()
-    komenda= "call free_player(%s)"
-    cursor.execute(komenda,(id,))
+    komenda = "call free_player(%s)"
+    cursor.execute(komenda, (id,))
     connection.commit()
-    odlacz(cursor,connection)
+    odlacz(cursor, connection)
     return 0
