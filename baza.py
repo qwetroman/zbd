@@ -465,6 +465,14 @@ def get_team_id(name):
     odlacz(cursor,connection)
     return myresult[0][0]
 
+def get_manager_id(name,surname,phone):
+    connection, cursor = polaczenie()
+    komenda = "select manager_id from team_menager where first_name = %s,last_name = %s,phone_number = %s"
+    cursor.execute(komenda,(name,surname,phone))
+    myresult=cursor.fetchall()
+    odlacz(cursor,connection)
+    return myresult[0][0]
+
 
 
 
@@ -473,10 +481,11 @@ def get_team_id(name):
 
  def update_manager(first_name, last_name, phone_number,team):
     connection, cursor = polaczenie()
-    id=get_team_id(team)
-    komenda = "update team_menager SET first_name=%s,last_name=%s,phone_number=%s,player_id=%s where " \
-              "physios_id=%s; "
-    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
+    team_id=get_team_id(team)
+    manager_id=get_manager_id(first_name,last_name,phone_number)
+    komenda = "update team_menager SET first_name=%s,last_name=%s,phone_number=%s,team_id=%s where " \
+              "manager_id=%s; "
+    data = (first_name, last_name, phone_number, team_id, manager_id)
     cursor.execute(komenda, data)
     connection.commit()
     odlacz(cursor, connection)
