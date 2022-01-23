@@ -467,16 +467,11 @@ def get_team_id(name):
 
 def get_manager_id(name,surname,phone):
     connection, cursor = polaczenie()
-    komenda = "select manager_id from team_menager where first_name = %s,last_name = %s,phone_number = %s"
+    komenda = "select manager_id from team_menager where first_name = %s and last_name = %s and phone_number = %s"
     cursor.execute(komenda,(name,surname,phone))
     myresult=cursor.fetchall()
     odlacz(cursor,connection)
     return myresult[0][0]
-
-
-
-
-
 
 
  def update_manager(first_name, last_name, phone_number,team):
@@ -497,3 +492,13 @@ def free_player(id):
     connection.commit()
     odlacz(cursor, connection)
     return 0
+def get_all_manager():
+    connection,cursor = polaczenie()
+    komenda ="select first_name,last_name,phone_number from team_menager "
+    cursor.execute(komenda)
+    myresult=cursor.fetchall()
+    managers=[]
+    for x in myresult:
+        manager=x[0]+x[1]+x[2]
+        managers.append(manager)
+    return managers
