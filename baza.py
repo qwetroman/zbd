@@ -440,34 +440,47 @@ def pobierz_managera():
 
 
 def delete_manager(id):
-    connection, cursor = polaczenie()
-    komenda = "Delete from team_menager where manager_id=%s;"
-    cursor.execute(komenda, (id,))
-    connection.commit()
-    odlacz(cursor, connection)
-    return 0
+  connection, cursor = polaczenie()
+  komenda = "Delete from team_menager where manager_id=%s;"
+  cursor.execute(komenda, (id,))
+  connection.commit()
+  odlacz(cursor, connection)
+  return 0
 
 
 def create_manager(first_name, last_name, phone_number):
+  connection, cursor = polaczenie()
+  komenda = "insert into team_menager(first_name,last_name,phone_number) values (%s,%s,%s);"
+  data = (first_name, last_name, phone_number)
+  cursor.execute(komenda, data)
+  connection.commit()
+  odlacz(cursor, connection)
+  return 0
+
+def get_team_id(name):
     connection, cursor = polaczenie()
-    komenda = "insert into team_menager(first_name,last_name,phone_number) values (%s,%s,%s);"
-    data = (first_name, last_name, phone_number)
+    komenda = "select team_id from football_team where team_name = %s"
+    cursor.execute(komenda,(name,))
+    myresult=cursor.fetchall()
+    odlacz(cursor,connection)
+    return myresult[0][0]
+
+
+
+
+
+
+
+ def update_manager(first_name, last_name, phone_number,team):
+    connection, cursor = polaczenie()
+    id=get_team_id(team)
+    komenda = "update team_menager SET first_name=%s,last_name=%s,phone_number=%s,player_id=%s where " \
+              "physios_id=%s; "
+    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
     cursor.execute(komenda, data)
     connection.commit()
     odlacz(cursor, connection)
     return 0
-
-
-# def update_manager(first_name, last_name, phone_number, physios_type, player_id):
-#    connection, cursor = polaczenie()
-#    komenda = "update physios SET first_name=%s,last_name=%s,phone_number=%s,physios_type=%s,player_id=%s where " \
-#
-#              "physios_id=%s; "
-#    data = (first_name, last_name, phone_number, physios_type, player_id,physio_id)
-#    cursor.execute(komenda, data)
-#    connection.commit()
-#    odlacz(cursor, connection)
-#    return 0
 def free_player(id):
     connection, cursor = polaczenie()
     komenda = "call free_player(%s)"
