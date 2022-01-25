@@ -79,6 +79,13 @@ def pobierz_zawodnikow():
         players.append(player)
     return players
 
+def get_budget_id(id):
+    connection,cursor = polaczenie()
+    komenda = "select balance, debt, profit, expenses from budget left join football_club on budget.budget_id= football_team.budget_id"
+    cursor.execute(komenda,(id,))
+    myresult=cursor.fetchall()
+    return myresult[0][0],myresult[0][1],myresult[0][2],myresult[0][3]
+
 
 def pobierz_druzyny_do_edycji(id):
     connection, cursor = polaczenie()
@@ -92,12 +99,17 @@ def pobierz_druzyny_do_edycji(id):
     myresult = cursor.fetchall()
     teams = []
     for x in myresult:
+        balance,debt,profit,expenses=get_budget_id(id)
         team = {'nazwa': x[1],
                 'Number_of_players': x[2],
                 'Manager_name': x[3],
                 'Manager_lastname': x[4],
                 'id': x[0],
-                'Home_stadion': 'temp'}
+                'Home_stadion': 'temp',
+                'Balance': balance,
+                'Debt':debt,
+                'Profit':profit,
+                'Expenses':expenses}
 
         teams.append(team)
         odlacz(cursor, connection)
