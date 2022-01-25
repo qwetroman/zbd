@@ -514,3 +514,34 @@ def get_all_manager():
         manager=x[0]+x[1]+x[2]
         managers.append(manager)
     return managers
+def delete_team(name):
+    connection, cursor = polaczenie()
+    komenda2 = "select team_id from football_team where team_name = %s; "
+    komenda1="update players set team_id= NULL where team_id=%s;"
+    komenda = "Delete from football_team where team_name=%s;"
+    cursor.execute(komenda2,(name,))
+    myresult2=cursor.fetchall()
+    curcor.execute(komenda1,(myresult2[0][0],))
+    cursor.execute(komenda, (name,))
+    connection.commit()
+    odlacz(cursor, connection)
+    return 0
+def delete_player(name,surname,phone):
+    connection, cursor = polaczenie()
+    id=get_player_id(name,surname,phone)
+    komenda2 = "select team_id from players where id = %s; "
+    komenda3="Select number_of_players from football_team where team_id=%s"
+    komenda1="update football_team set number_of_players= number_of_players-1 where team_id=%s;"
+    komenda = "Delete from players where id=%s;"
+    cursor.execute(komenda2,(id,))
+    myresult2=cursor.fetchall()
+    curcor.execute(komenda3,(myresult2[0][0],))
+    myresult3=cursor.fetchall()
+    if int(myresult3)<=23:
+        return "Team is too small"
+    else:
+        cursor.execute(komenda1,(myresult2[0][0],))
+        cursor.execute(komenda, (id,))
+        connection.commit()
+        odlacz(cursor, connection)
+        return 0
