@@ -391,12 +391,13 @@ def delete_physio(id):
     return 0
 
 
-def create_physio(first_name, last_name, phone_number, physios_type):
+def create_physio(first_name, last_name, phone_number, physios_type,player_name,player_surname,player_phone):
     connection, cursor = polaczenie()
+    id=get_player_id(player_name,player_surname,player_phone)
 
-    komenda = "insert into physios(first_name,last_name,phone_number,physios_type) values (%s,%s,%s,%s);"
+    komenda = "insert into physios(first_name,last_name,phone_number,physios_type,player_id) values (%s,%s,%s,%s,%s);"
 
-    data = (first_name, last_name, phone_number, physios_type)
+    data = (first_name, last_name, phone_number, physios_type,id)
 
     cursor.execute(komenda, data)
     connection.commit()
