@@ -18,7 +18,7 @@
       <td> {{ post.name }} {{ post.last_name }} </td>
       <td> {{ post.phone_number }} </td>
       <td> <div class='btn btn-outline-warning'>
-        <a href="{{ url_for('TransferPlayer',variable=variable) }}">Dokonaj transferu</a>
+        <a href="{{ url_for('TransferPlayer', player_id=post.player_id)}}">Dokonaj transferu</a>
       </div> </td>
     </tr>
     {% endfor %}
@@ -26,9 +26,9 @@
 
 
     </p>
-    <!-- <div class='btn btn-outline-warning'>
-      <a href="{{ url_for('EditSquad',variable=variable) }}">Edytuj skład</a>
-    </div> -->
+    <div class='btn btn-outline-warning'>
+      <a href="{{ url_for('EditSquad',variable=variable) }}">Dodaj zawodnika do składu</a>
+    </div>
   {% endblock content %}
   {% block scripts %}
   <script>

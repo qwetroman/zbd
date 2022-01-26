@@ -28,14 +28,14 @@
         <a href="{{ url_for('about', variable=post.id) }}">Edytuj dane trenera</a>
       </div> </td>
       <td> <div class='btn btn-outline-danger'>
-      <a href="{{ url_for('about') }}">Usuń trenera</a>
+      <a href="{{ url_for('DeleteCoach',variable=post.id) }}">Usuń trenera</a>
       </div> </td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
   <div class='btn btn-outline-info'>
-    <a href="{{ url_for('about') }}">Dodaj trenera</a>
+    <a href="{{ url_for('AddCoach') }}">Dodaj trenera</a>
   </div>
   {% endblock content %}
 
