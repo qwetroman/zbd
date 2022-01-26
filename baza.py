@@ -261,11 +261,18 @@ def assign_player(connection, cursor, player_id, team_id):
     connection.commit()
     return 0
 
+def update_budget(connection, cursor,id, balance, debt, profit,expenses):
+    komenda = "update budget SET balance=%s,debt=%s,profit=%s,expenses=%s where budget_id=%s;"
+    data = (balance, debt, profit, expenses, id)
+    cursor.execute(komenda, data)
 
-def add_team(connection, cursor, name, stadion_id,season_id,manager_id, balance, debt, profit, expenses, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11):
+    return 0
+
+def add_team(connection, cursor, name, stadion_id, season_id, manager_id, balance, debt, profit, expenses, id1, id2,
+             id3, id4, id5, id6, id7, id8, id9, id10, id11):
     komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s);"
     komenda2 = "select team_id from football_team where name = %s"
-    data = (name, season_id, manager_id,stadion_id,
+    data = (name, season_id, manager_id, stadion_id,
             balance, debt, profit, expenses)
     cursor.execute(komenda, data)
     cursor.execute(komenda2, (name,))
@@ -282,6 +289,18 @@ def add_team(connection, cursor, name, stadion_id,season_id,manager_id, balance,
     assign_player(connection, cursor, id10, idres)
     assign_player(connection, cursor, id11, idres)
 
+    connection.commit()
+
+    return 0
+def update_team(connection, cursor, name, stadion_id, season_id, manager_id, balance, debt, profit, expenses):
+    komenda = "update football_team set name=%s,stadion_id=%s,season_id=%s,stadion_id=%s,manager_id=%s where team_id=%s"
+    komenda2 = "select team_id,budget_id from football_team where name = %s"
+    cursor.execute(komenda2, (name,))
+    idres = cursor.fetchall()
+    data = (name, season_id, manager_id, stadion_id,
+            idres)
+    cursor.execute(komenda, data)
+    update_budget(connection,cursor,balance,debt,profit,expenses)
     connection.commit()
 
     return 0
@@ -484,11 +503,11 @@ def create_coach(first_name, last_name, phone_number, nationality):
     return 0
 
 
-def update_coach(first_name, last_name, phone_number, nationality):
+def update_coach(first_name, last_name, phone_number, nationality, id):
     connection, cursor = polaczenie()
-    komenda = "update stadion SET address=%s,number_of_seats=%s,name=%s where stadion_id=%s;"
-    data = (first_name, last_name, phone_number, nationality)
-    cursor.execute(komenda, first_name, last_name, phone_number, nationality)
+    komenda = "update coach SET first_name=%s,last_name=%s,phone_number=%s,nationality=%s where coach_id=%s;"
+    data = (first_name, last_name, phone_number, nationality, id)
+    cursor.execute(komenda, data)
 
     return 0
 
@@ -765,6 +784,54 @@ def create_history(connection, cursor, id_one, id_two, score_one, score_two, dat
     connection.commit()
 
 
+def pobierz_employee(connection, cursor):
+    komenda = (
+
+        "SELECT employee.employee_id,employee.first_name,employee.last_name,employee.phone_number,football_team.team_name FROM employee left join football_team on employee.team_id=football_team.team_id")
+    cursor.execute(komenda)
+    myresult = cursor.fetchall()
+    employees = []
+
+    for x in myresult:
+        employee = {'id': x[0],
+
+                    'name': x[1],
+
+                    'last_name': x[2],
+
+                    'phone': x[3],
+
+                    'Employer': x[4]
+
+                    }
+
+        physios.append(physio)
+
+    return employees
 
 
+def update_employee(first_name, last_name, phone_number, id):
+    connection, cursor = polaczenie()
+    komenda = "update employee SET first_name=%s,last_name=%s,phone_number=%s where employee_id=%s;"
+    data = (first_name, last_name, phone_number, id)
+    cursor.execute(komenda, data)
 
+    return 0
+
+
+def create_employee(first_name, last_name, phone_number):
+    connection, cursor = polaczenie()
+    komenda = "insert into employees(first_name,last_name,phone_number) values (%s,%s,%s);"
+    data = (first_name, last_name, phone_number)
+    cursor.execute(komenda, data)
+    connection.commit()
+
+    return 0
+
+def delete_employee(id):
+    connection, cursor = polaczenie()
+    komenda = "Delete from employees where employee_id=%s;"
+    cursor.execute(komenda, (int(id),))
+    connection.commit()
+
+    return 0
