@@ -35,7 +35,8 @@ def odlacz(connection, cursor):
 
 
 def pobierz_druzyny(connection, cursor):
-    komenda = ("SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
+    komenda = (
+        "SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
 
     cursor.execute(komenda)
 
@@ -54,7 +55,8 @@ def pobierz_druzyny(connection, cursor):
 
 
 def pobierz_zawodnikow(connection, cursor):
-    komenda = ("SELECT first_name, last_name,phone_number, team_name, player_id from players left join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
+    komenda = (
+        "SELECT first_name, last_name,phone_number, team_name, player_id from players left join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
 
     cursor.execute(komenda)
 
@@ -73,7 +75,6 @@ def pobierz_zawodnikow(connection, cursor):
 
 
 def create_player(connection, cursor, name, last_name, phone):
-
     komenda = "insert into players(first_name, last_name, phone_number) values (%s, %s, %s)"
     dane = (name, last_name, phone)
     cursor.execute(komenda, dane)
@@ -81,7 +82,8 @@ def create_player(connection, cursor, name, last_name, phone):
 
 
 def pobierz_wolnych_zawodnikow(connection, cursor):
-    komenda = ("SELECT first_name, last_name,phone_number, team_name, player_id from players left join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
+    komenda = (
+        "SELECT first_name, last_name,phone_number, team_name, player_id from players left join football_team on players.team_id = football_team.team_id ORDER BY TEAM_NAME;")
     cursor.execute(komenda)
 
     myresult = cursor.fetchall()
@@ -99,7 +101,8 @@ def pobierz_wolnych_zawodnikow(connection, cursor):
 
 
 def pobierz_druzyny_do_edycji(connection, cursor, id):
-    komenda = ("SELECT team_id,team_name,number_of_players,first_name,last_name FROM football_team inner join team_menager on team_menager.manager_id=football_team.manager_id where team_id = %s;")
+    komenda = (
+        "SELECT team_id,team_name,number_of_players,first_name,last_name FROM football_team inner join team_menager on team_menager.manager_id=football_team.manager_id where team_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -120,7 +123,8 @@ def pobierz_druzyny_do_edycji(connection, cursor, id):
 
 
 def pobierz_sklad(connection, cursor, id):
-    komenda = ("SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name,players.player_id FROM PLAYERS left JOIN FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
+    komenda = (
+        "SELECT FIRST_NAME,LAST_NAME,PHONE_NUMBER,players.team_id,football_team.team_name,players.player_id FROM PLAYERS left JOIN FOOTBALL_TEAM ON FOOTBALL_TEAM.TEAM_ID = PLAYERS.TEAM_ID where players.team_id = %s;")
 
     cursor.execute(komenda, (int(id),))
     # cursor.execute(komenda)
@@ -250,16 +254,39 @@ def pobierz_gre(connection, cursor, id):
     komenda = ("select * from match_history where match_id = %s;")
 
 
+def assign_player(connection, cursor, player_id, team_id):
+    komenda = "update players set team_id=%s where player_id=%s"
+    data = (team_id, player_id)
+    cursor.execute(komenda, data)
+    connection.commit()
+    return 0
+
+
 def add_team(connection, cursor, name, season, adress, capacity, manager_name, manager_surname,
-             manager_phone, balance, debt, profit, expenses):
+             manager_phone, balance, debt, profit, expenses, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11):
     komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
     komenda1 = "select season_id from season where season_name = %s"
+    komenda2 = "select team_id from football_team where name = %s"
     cursor.execute(komenda1, (season,))
     myresult = cursor.fetchall()
     season_id = myresult[0][0]
     data = (name, season_id, adress, capacity, manager_name, manager_surname,
             manager_phone, balance, debt, profit, expenses)
     cursor.execute(komenda, data)
+    cursor.execute(komenda2, (name,))
+    idres = cursor.fetchall()
+    assign_player(connection, cursor, id1, idres)
+    assign_player(connection, cursor, id2, idres)
+    assign_player(connection, cursor, id3, idres)
+    assign_player(connection, cursor, id4, idres)
+    assign_player(connection, cursor, id5, idres)
+    assign_player(connection, cursor, id6, idres)
+    assign_player(connection, cursor, id7, idres)
+    assign_player(connection, cursor, id8, idres)
+    assign_player(connection, cursor, id9, idres)
+    assign_player(connection, cursor, id10, idres)
+    assign_player(connection, cursor, id11, idres)
+
     connection.commit()
 
     return 0
@@ -279,7 +306,6 @@ def add_player(connection, cursor, name, surname, phone, team):
 
 
 def pobierz_nazwy_druzyn(connection, cursor):
-
     komenda = "SELECT TEAM_NAME, team_id FROM FOOTBALL_TEAM"
     cursor.execute(komenda)
     result = cursor.fetchall()
@@ -567,7 +593,8 @@ def get_player_id(name, surname, phone):
     return myresult[0][0]
 
 
-def update_physios(physio_id, first_name, last_name, phone_number, physios_type, player_name, player_surname, player_phone):
+def update_physios(physio_id, first_name, last_name, phone_number, physios_type, player_name, player_surname,
+                   player_phone):
     connection, cursor = polaczenie()
     player_id = get_player_id(player_name, player_surname, player_phone)
 
@@ -711,7 +738,6 @@ def delete_player(connection, cursor, id):
 
 
 def delete_team(connection, cursor, id):
-
     # komenda2 = "select team_id from football_team where team_name = %s; "
     komenda1 = "update players set team_id= NULL where team_id=%s;"
     komenda = "Delete from football_team where team_id=%s;"
