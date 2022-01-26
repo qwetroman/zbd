@@ -262,16 +262,11 @@ def assign_player(connection, cursor, player_id, team_id):
     return 0
 
 
-def add_team(connection, cursor, name, season, adress, capacity, manager_name, manager_surname,
-             manager_phone, balance, debt, profit, expenses, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11):
-    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-    komenda1 = "select season_id from season where season_name = %s"
+def add_team(connection, cursor, name, stadion_id,season_id,manager_id, balance, debt, profit, expenses, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11):
+    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s);"
     komenda2 = "select team_id from football_team where name = %s"
-    cursor.execute(komenda1, (season,))
-    myresult = cursor.fetchall()
-    season_id = myresult[0][0]
-    data = (name, season_id, adress, capacity, manager_name, manager_surname,
-            manager_phone, balance, debt, profit, expenses)
+    data = (name, season_id, manager_id,stadion_id,
+            balance, debt, profit, expenses)
     cursor.execute(komenda, data)
     cursor.execute(komenda2, (name,))
     idres = cursor.fetchall()
@@ -768,3 +763,92 @@ def create_history(connection, cursor, id_one, id_two, score_one, score_two, dat
     print(dane)
     cursor.execute(komenda2, dane)
     connection.commit()
+
+
+
+
+def pobierz_employee():
+    connection, cursor = polaczenie()
+
+    komenda = (
+
+        "SELECT physios_id,physios.first_name,physios.last_name,physios.phone_number,physios_type,players.first_name,players.last_name FROM physios left join players on physios.player_id=players.player_id")
+    cursor.execute(komenda)
+    myresult = cursor.fetchall()
+    physios = []
+
+    for x in myresult:
+        physio = {'id': x[0],
+
+                  'name': x[1],
+
+                  'last_name': x[2],
+
+                  'phone': x[3],
+
+                  'type': x[4],
+
+                  'player_last_name': x[-1],
+
+                  'player_name': x[-2]
+
+                  }
+
+        physios.append(physio)
+
+    return physios
+
+
+def pobierz_physio_id(id):
+    connection, cursor = polaczenie()
+    komenda = "SELECT * FROM PHYSIOS WHERE PHYSIOS_ID=%s"
+    cursor.execute(komenda, (int(id),))
+    myresult = cursor.fetchall()
+    physios = []
+
+    for x in myresult:
+        physio = {'id': x[0],
+
+                  'name': x[1],
+
+                  'last_name': x[2],
+
+                  'phone': x[3],
+
+                  'type': x[4],
+
+                  'player_last_name': x[-1],
+
+                  'player_name': x[-2]
+
+                  }
+
+        physios.append(physio)
+
+    return physios
+
+
+def delete_physio(id):
+    connection, cursor = polaczenie()
+
+    komenda = "Delete from physios where physios_id=%s;"
+
+    cursor.execute(komenda, (id,))
+    connection.commit()
+
+    return 0
+
+
+def create_physio(first_name, last_name, phone_number, physios_type, player):
+    connection, cursor = polaczenie()
+    name, surname, phone = player.split()
+    id = get_player_id(name, surname, phone)
+    komenda = "insert into physios(first_name,last_name,phone_number,physios_type,player_id) values (%s,%s,%s,%s,%s);"
+
+    data = (first_name, last_name, phone_number, physios_type, id)
+
+    cursor.execute(komenda, data)
+    connection.commit()
+
+    return 0
+
