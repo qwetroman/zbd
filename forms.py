@@ -1,25 +1,42 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, DateField
-from wtforms.validators import DataRequired, Length, NumberRange, Optional
+from wtforms import StringField, IntegerField, SubmitField, DateField, SelectField
+from wtforms.validators import DataRequired, Length, NumberRange, Optional, NoneOf
+from baza import pobierz_nazwy_druzyn, pobierz_zawodnikow_i_numery, pobierz_wolnego_managera, pobierz_stadiony, pobierz_wolnych_zawodnikow
 
 
 class AddTeamForm(FlaskForm):
+
     TeamName = StringField('Nazwa drużyny', [
                            DataRequired(), Length(min=2)])
 
-    NumberOfPlayers = IntegerField('Liczba graczy',
-                                   [DataRequired(),
-                                    NumberRange(min=11, max=23,
-                                                message='Minimum number of'
-                                                + 'players is 11, max 23')])
+    Player1 = SelectField('Zawodnik 1',
+                          validators=[DataRequired()])
+    Player2 = SelectField('Zawodnik 2',
+                          validators=[DataRequired()])
+    Player3 = SelectField('Zawodnik 3',
+                          validators=[DataRequired()])
+    Player4 = SelectField('Zawodnik 4',
+                          validators=[DataRequired()])
+    Player5 = SelectField('Zawodnik 5',
+                          validators=[DataRequired()])
+    Player6 = SelectField('Zawodnik 6',
+                          validators=[DataRequired()])
+    Player7 = SelectField('Zawodnik 7',
+                          validators=[DataRequired()])
+    Player8 = SelectField('Zawodnik 8',
+                          validators=[DataRequired()])
+    Player9 = SelectField('Zawodnik 9',
+                          validators=[DataRequired()])
+    Player10 = SelectField('Zawodnik 10',
+                           validators=[DataRequired()])
+    Player11 = SelectField('Zawodnik 11',
+                           validators=[DataRequired()])
 
-    StadionName = StringField('Nazwa stadionu domowego', [DataRequired()])
+    StadionName = SelectField(
+        'Nazwa stadionu domowego', validators=[DataRequired()])
 
-    TeamManagerName = StringField(
-        'Imię menadżera', [DataRequired()])
-
-    TeamManagerSurname = StringField(
-        'Nazwisko menadżera', [DataRequired()])
+    TeamManagerName = SelectField(
+        'Wybierz wolnego menadżera', validators=[DataRequired()])
 
     BudgetBalance = IntegerField(
         'Stan budżetu drużyny', [DataRequired()])
@@ -35,15 +52,46 @@ class AddTeamForm(FlaskForm):
 
     submit = SubmitField("Dodaj drużynę")
 
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        result = True
+        seen = set()
+        for field in [self.Player1, self.Player2, self.Player3, self.Player4, self.Player5, self.Player6, self.Player7, self.Player8, self.Player9, self.Player10, self.Player11]:
+            if field.data in seen:
+                field.errors.append('Please select three distinct choices.')
+                result = False
+            else:
+                seen.add(field.data)
+        return result
+
 
 class AddGameForm(FlaskForm):
-    TeamO = StringField("Nazwa druzyny 1", [DataRequired(), Length(min=2)])
-    TeamT = StringField("Nazwa druzyny 2", [DataRequired(), Length(min=2)])
-    StadionName = StringField(
+
+    TeamO = SelectField(u'Drużyna 1',
+                        validators=[DataRequired()])
+    TeamT = SelectField(u'Drużyna 2',
+                        validators=[DataRequired()])
+    PointsO = IntegerField("Punkty drużyny 1", [DataRequired()])
+    PointsT = IntegerField("Punkty drużyny 2", [DataRequired()])
+    StadionName = SelectField(
         "Nazwa stadionu", [DataRequired(), Length(min=2)])
     GameDate = DateField(
         "Data gry", [DataRequired()])
     submit = SubmitField("Dodaj grę")
+
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        result = True
+        seen = set()
+        for field in [self.TeamO, self.TeamT]:
+            if field.data in seen:
+                field.errors.append('Please select three distinct choices.')
+                result = False
+            else:
+                seen.add(field.data)
+        return result
 
 
 class AddStadionForm(FlaskForm):
@@ -51,14 +99,21 @@ class AddStadionForm(FlaskForm):
     adres = StringField("Adres stadionu", [DataRequired()])
     seats = IntegerField(
         'Ilośc siedzeń', [DataRequired(), NumberRange(min=1)])
-    submit = SubmitField("Dodaj stadion")
+    submit = SubmitField("Zatwierdź")
+
+
+class DeleteStadionForm(FlaskForm):
+    submit = SubmitField("Usuń")
 
 
 class AddPlayerForm(FlaskForm):
+    # teams = pobierz_nazwy_druzyn()
+    # teams.append('Brak drużyny')
     name = StringField("Imię gracza", [DataRequired()])
     lastname = StringField("Nazwisko gracza", [DataRequired()])
     phone = StringField("Phone number", [DataRequired()])
-    team = StringField("Drużyna (opcjonalne)")
+    # team = SelectField("Drużyna (opcjonalne)", choices=teams,
+    #                    validators=[DataRequired()])
     submit = SubmitField("Dodaj zawodnika")
 
 
@@ -74,7 +129,7 @@ class AddSeasonForm(FlaskForm):
     country = StringField("Kraj", [DataRequired()])
     beggining = DateField("Początek", [DataRequired()])
     end = DateField("Koniec", [DataRequired()])
-    submit = SubmitField("Dodaj stadion")
+    submit = SubmitField("Edytuj sezon")
 
 
 class EditTeamForm(FlaskForm):
@@ -109,101 +164,46 @@ class EditTeamForm(FlaskForm):
     submit = SubmitField("Edytuj drużynę")
 
 
+class TransferForm(FlaskForm):
+    Druzyny = SelectField("Drużyna do ktorej gracz zostanie przeniesiony",
+                          validators=[DataRequired()])
+    Koszt = IntegerField("Koszt transferu", [
+                         DataRequired(), NumberRange(min=0)])
+    submit = SubmitField("Dokonaj transferu")
+
+
 class EditSquadForm(FlaskForm):
-    name1 = StringField("Imię zawodnika", [DataRequired()])
-    last_name1 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone1 = StringField("Numer telefonu", [DataRequired()])
+    Zawodnik = SelectField("Wolni gracze",
+                           validators=[DataRequired()])
+    submit = SubmitField("Dodaj zawodnika")
 
-    name2 = StringField("Imię zawodnika", [DataRequired()])
-    last_name2 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone2 = StringField("Numer telefonu", [DataRequired()])
 
-    name3 = StringField("Imię zawodnika", [DataRequired()])
-    last_name3 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone3 = StringField("Numer telefonu", [DataRequired()])
+class AddPhysioForm(FlaskForm):
+    players = pobierz_zawodnikow_i_numery()
+    name = StringField('Imię', [DataRequired()])
+    last_name = StringField('Nazwisko', [DataRequired()])
+    type = StringField('Typ', [DataRequired()])
+    phone = StringField('Numer telefonu', [DataRequired()])
 
-    name4 = StringField("Imię zawodnika", [DataRequired()])
-    last_name4 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone4 = StringField("Numer telefonu", [DataRequired()])
+    player = SelectField("Zawodnik", choices=players,
+                         validators=[DataRequired()])
+    submit = SubmitField("Zatwierdź")
 
-    name5 = StringField("Imię zawodnika", [DataRequired()])
-    last_name5 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone5 = StringField("Numer telefonu", [DataRequired()])
 
-    name6 = StringField("Imię zawodnika", [DataRequired()])
-    last_name6 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone6 = StringField("Numer telefonu", [DataRequired()])
+class AddCoachForm(FlaskForm):
 
-    name7 = StringField("Imię zawodnika", [DataRequired()])
-    last_name7 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone7 = StringField("Numer telefonu", [DataRequired()])
+    name = StringField('Imię', [DataRequired()])
+    last_name = StringField('Nazwisko', [DataRequired()])
+    phone = StringField('Numer telefonu', [DataRequired()])
+    nationality = StringField('Narodowośc', [DataRequired()])
 
-    name8 = StringField("Imię zawodnika", [DataRequired()])
-    last_name8 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone8 = StringField("Numer telefonu", [DataRequired()])
+    team = SelectField("Druzyna",
+                       validators=[DataRequired()])
+    submit = SubmitField("Dodaj")
 
-    name9 = StringField("Imię zawodnika", [DataRequired()])
-    last_name9 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone9 = StringField("Numer telefonu", [DataRequired()])
 
-    name10 = StringField("Imię zawodnika", [DataRequired()])
-    last_name10 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone10 = StringField("Numer telefonu", [DataRequired()])
-
-    name11 = StringField("Imię zawodnika", [DataRequired()])
-    last_name11 = StringField("Nazwisko zawodnika", [DataRequired()])
-    phone11 = StringField("Numer telefonu", [DataRequired()])
-
-    name11 = StringField("Imię zawodnika")
-    last_name11 = StringField("Nazwisko zawodnika")
-    phone11 = StringField("Numer telefonu")
-
-    name12 = StringField("Imię zawodnika")
-    last_name12 = StringField("Nazwisko zawodnika")
-    phone12 = StringField("Numer telefonu")
-
-    name13 = StringField("Imię zawodnika")
-    last_name13 = StringField("Nazwisko zawodnika")
-    phone13 = StringField("Numer telefonu")
-
-    name14 = StringField("Imię zawodnika")
-    last_name14 = StringField("Nazwisko zawodnika")
-    phone14 = StringField("Numer telefonu")
-
-    name15 = StringField("Imię zawodnika")
-    last_name15 = StringField("Nazwisko zawodnika")
-    phone15 = StringField("Numer telefonu")
-
-    name16 = StringField("Imię zawodnika")
-    last_name16 = StringField("Nazwisko zawodnika")
-    phone16 = StringField("Numer telefonu")
-
-    name17 = StringField("Imię zawodnika")
-    last_name17 = StringField("Nazwisko zawodnika")
-    phone17 = StringField("Numer telefonu")
-
-    name18 = StringField("Imię zawodnika")
-    last_name18 = StringField("Nazwisko zawodnika")
-    phone18 = StringField("Numer telefonu")
-
-    name19 = StringField("Imię zawodnika")
-    last_name19 = StringField("Nazwisko zawodnika")
-    phone19 = StringField("Numer telefonu")
-
-    name20 = StringField("Imię zawodnika")
-    last_name20 = StringField("Nazwisko zawodnika")
-    phone20 = StringField("Numer telefonu")
-
-    name21 = StringField("Imię zawodnika")
-    last_name21 = StringField("Nazwisko zawodnika")
-    phone21 = StringField("Numer telefonu")
-
-    name22 = StringField("Imię zawodnika")
-    last_name22 = StringField("Nazwisko zawodnika")
-    phone22 = StringField("Numer telefonu")
-
-    name23 = StringField("Imię zawodnika")
-    last_name23 = StringField("Nazwisko zawodnika")
-    phone23 = StringField("Numer telefonu")
-
-    submit = SubmitField("Edytuj skład")
+class AddManagerForm(FlaskForm):
+    name = StringField('Imię', [DataRequired()])
+    last_name = StringField('Nazwisko', [DataRequired()])
+    phone = StringField('Numer telefonu', [DataRequired()])
+    submit = SubmitField("Dodaj")

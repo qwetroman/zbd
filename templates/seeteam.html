@@ -1,14 +1,45 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1> {{title}} </h1>
+<table id = "teams" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+  <thead>
+      <tr>
+          <th class="th-sm">Imię i nazwisko
+          </th>
+          <th class="th-sm">Numer telefonu
+          </th>
+          <th class="th-sm">Transfer
+          </th>
+        </tr>
+    </thead>
+    <tbody>
     {% for post in posts %}
-      <p> {{ post.name }} {{ post.last_name }} {{ post.phone_number }} </p>
+    <tr>
+      <td> {{ post.name }} {{ post.last_name }} </td>
+      <td> {{ post.phone_number }} </td>
+      <td> <div class='btn btn-outline-warning'>
+        <a href="{{ url_for('TransferPlayer', player_id=post.player_id)}}">Dokonaj transferu</a>
+      </div> </td>
+    </tr>
     {% endfor %}
     <p>
 
 
     </p>
     <div class='btn btn-outline-warning'>
-      <a href="{{ url_for('EditSquad',variable=variable) }}">Edytuj skład</a>
+      <a href="{{ url_for('EditSquad',variable=variable) }}">Dodaj zawodnika do składu</a>
     </div>
   {% endblock content %}
+  {% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#teams').DataTable({
+        columns: [
+          null,
+          {searchable: false},
+          {orderable: false, searchable: false},
+        ],
+      });
+    });
+  </script>
+  {% endblock %}

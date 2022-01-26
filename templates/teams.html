@@ -33,7 +33,7 @@
         <a href="{{ url_for('EditTeam', variable=post.id) }}">Edytuj drużynę</a>
       </div> </td>
       <td> <div class='btn btn-outline-danger'>
-      <a href="{{ url_for('AddTeam') }}">Usuń drużynę</a>
+      <a href="{{ url_for('DeleteTeam',variable=post.id) }}">Usuń drużynę</a>
       </div> </td>
       </tr>
     {% endfor %}

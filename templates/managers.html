@@ -7,9 +7,9 @@
         </th>
         <th class="th-sm">Numer telefonu
         </th>
-        <th class="th-sm">Drużyna
+        <th class="th-sm">Druzyna
         </th>
-        <th class="th-sm">Edutuj
+        <th class="th-sm">Edytuj
         </th>
         <th class="th-sm">Usuń
         </th>
@@ -18,21 +18,21 @@
   <tbody>
     {% for post in posts %}
     <tr>
-      <td> {{post.name}} {{post.last_name}} </td>
-      <td>  {{post.phone_number}} </td>
-      <td>  {{post.team}} </td>
-      <td> <div class='btn btn-outline-info'>
-        <a href="{{ url_for('EditPlayer',variable = post.id) }}">Edytuj gracza</a>
+      <td> {{post.Name}} {{post.Surname}} </td>
+      <td>  {{post.Phone_number}} </td>
+      <td>  {{post.Employer}} </td>
+      <td> <div class='btn btn-outline-warning'>
+        <a href="{{ url_for('about') }}">Edytuj</a>
       </div> </td>
-      <td> <div class='btn btn-outline-info'>
-        <a href="{{ url_for('DeletePlayer', variable=post.id) }}">Usuń gracza</a>
+      <td> <div class='btn btn-outline-danger'>
+        <a href="{{ url_for('about') }}">Usuń</a>
       </div> </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
   <div class='btn btn-outline-info'>
-    <a href="{{ url_for('AddPlayer') }}">Dodaj gracza</a>
+    <a href="{{ url_for('AddManager') }}">Dodaj</a>
   </div>
   {% endblock content %}
 
