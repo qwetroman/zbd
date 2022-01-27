@@ -261,12 +261,14 @@ def assign_player(connection, cursor, player_id, team_id):
     connection.commit()
     return 0
 
-def update_budget(connection, cursor,id, balance, debt, profit,expenses):
+
+def update_budget(connection, cursor, id, balance, debt, profit, expenses):
     komenda = "update budget SET balance=%s,debt=%s,profit=%s,expenses=%s where budget_id=%s;"
     data = (balance, debt, profit, expenses, id)
     cursor.execute(komenda, data)
 
     return 0
+
 
 def add_team(connection, cursor, name, stadion_id, season_id, manager_id, balance, debt, profit, expenses, id1, id2,
              id3, id4, id5, id6, id7, id8, id9, id10, id11):
@@ -292,6 +294,8 @@ def add_team(connection, cursor, name, stadion_id, season_id, manager_id, balanc
     connection.commit()
 
     return 0
+
+
 def update_team(connection, cursor, name, stadion_id, season_id, manager_id, balance, debt, profit, expenses):
     komenda = "update football_team set name=%s,stadion_id=%s,season_id=%s,stadion_id=%s,manager_id=%s where team_id=%s"
     komenda2 = "select team_id,budget_id from football_team where name = %s"
@@ -300,7 +304,7 @@ def update_team(connection, cursor, name, stadion_id, season_id, manager_id, bal
     data = (name, season_id, manager_id, stadion_id,
             idres)
     cursor.execute(komenda, data)
-    update_budget(connection,cursor,balance,debt,profit,expenses)
+    update_budget(connection, cursor, balance, debt, profit, expenses)
     connection.commit()
 
     return 0
@@ -791,22 +795,43 @@ def pobierz_employee(connection, cursor):
     cursor.execute(komenda)
     myresult = cursor.fetchall()
     employees = []
-    komenda1="SELECT "
-
     for x in myresult:
-        employee = {'id': x[0],
+        komenda1 = "SELECT * from receptionists where employee_id=%s"
+        cursor.execute(komenda1, (x[0],))
+        res = cursor.fetchall()
+        if res[0][0] == "NULL":
 
-                    'name': x[1],
+            employee = {'id': x[0],
 
-                    'last_name': x[2],
+                        'name': x[1],
 
-                    'phone': x[3],
+                        'last_name': x[2],
 
-                    'Employer': x[4]
+                        'phone': x[3],
 
-                    }
+                        'Employer': x[4],
 
-        physios.append(physio)
+                        'Recepcjonista': 'Nie'
+
+                        }
+
+            employees.append(employee)
+        else:
+            employee = {'id': x[0],
+
+                        'name': x[1],
+
+                        'last_name': x[2],
+
+                        'phone': x[3],
+
+                        'Employer': x[4],
+
+                        'Recepcjonista': 'Tak'
+
+                        }
+            employees.append(employee)
+
 
     return employees
 
@@ -820,14 +845,20 @@ def update_employee(first_name, last_name, phone_number, id):
     return 0
 
 
-def create_employee(first_name, last_name, phone_number,team_id):
+def create_employee(first_name, last_name, phone_number, team_id,recepcjonista):
     connection, cursor = polaczenie()
     komenda = "insert into employees(first_name,last_name,phone_number,team_id) values (%s,%s,%s,%s);"
-    data = (first_name, last_name, phone_number,team_id)
+    komenda1= "insert into receptionist(employee_id,team_id) values(%s,%s);"
+    data = (first_name, last_name, phone_number, team_id)
     cursor.execute(komenda, data)
+    id=cursor.lastrowid
+    data1=(id,team_id)
+    if recepcjonista == "Tak":
+        cursor.execute(komenda1,data1)
     connection.commit()
 
     return 0
+
 
 def delete_employee(id):
     connection, cursor = polaczenie()
