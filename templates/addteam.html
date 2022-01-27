@@ -51,7 +51,20 @@
                         {{ form.TeamManagerName(class="form-control form-control-lg") }}
                     {% endif %}
           </div>
+          <div class="form group">
+            {{ form.SeasonName.label(class="form-control-label") }}
 
+                    {% if form.SeasonName.errors %}
+                        {{ form.SeasonName(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.TeamName.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.SeasonName(class="form-control form-control-lg") }}
+                    {% endif %}
+          </div>
 
           <div class="form group">
             {{ form.BudgetBalance.label(class="form-control-label") }}

@@ -7,9 +7,11 @@
         </th>
         <th class="th-sm">Numer telefonu
         </th>
-        <th class="th-sm">Druzyna
+        <th class="th-sm">Drużyna
         </th>
-        <th class="th-sm">Edytuj
+        <th class="th-sm">Recepcjonista
+        </th>
+        <th class="th-sm">Edutuj
         </th>
         <th class="th-sm">Usuń
         </th>
@@ -18,21 +20,22 @@
   <tbody>
     {% for post in posts %}
     <tr>
-      <td> {{post.Name}} {{post.Surname}} </td>
-      <td>  {{post.Phone_number}} </td>
+      <td> {{post.name}} {{post.last_name}} </td>
+      <td>  {{post.phone}} </td>
       <td>  {{post.Employer}} </td>
-      <td> <div class='btn btn-outline-warning'>
-        <a href="{{ url_for('EditManager',variable=post.id) }}">Edytuj</a>
+      <td>  {{post.Recepcjonista}} </td>
+      <td> <div class='btn btn-outline-info'>
+        <a href="{{ url_for('EditEmployee',variable = post.id) }}">Edytuj pracownika</a>
       </div> </td>
-      <td> <div class='btn btn-outline-danger'>
-        <a href="{{ url_for('about') }}">Usuń</a>
+      <td> <div class='btn btn-outline-info'>
+        <a href="{{ url_for('DeleteEmployee', variable=post.id) }}">Usuń pracownika</a>
       </div> </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
   <div class='btn btn-outline-info'>
-    <a href="{{ url_for('AddManager') }}">Dodaj</a>
+    <a href="{{ url_for('AddEmployee') }}">Dodaj pracownika</a>
   </div>
   {% endblock content %}
 
@@ -45,7 +48,7 @@
           {searchable: true},
           {orderable: false, searchable: true},
           {orderable: false, searchable: true},
-          null],
+          null,null],
       });
     });
   </script>

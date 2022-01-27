@@ -35,19 +35,38 @@ def odlacz(connection, cursor):
 
 
 def pobierz_druzyny(connection, cursor):
-    komenda = ("SELECT team_id, team_name,number_of_players, first_name, last_name FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
+    komenda = ("SELECT team_id, team_name,number_of_players, first_name, last_name,stadion_id,budget_id,season_id FROM football_team inner join team_menager on team_menager.manager_id = football_team.manager_id")
 
     cursor.execute(komenda)
 
     myresult = cursor.fetchall()
     teams = []
     for x in myresult:
+        cursor.execute(
+            "select name from stadion where stadion_id=%s", (int(x[5]),))
+        stadion = cursor.fetchall()
+        cursor.execute("select * from budget where budget_id=%s", (int(x[6]),))
+        hajs = cursor.fetchall()
+        if x[7] != None:
+            cursor.execute(
+                "select season_name from season where season_id=%s", (int(x[7]),))
+            season = cursor.fetchall()
+            season = season[0][0]
+        else:
+            season = None
         team = {'nazwa': x[1],
                 'Number_of_players': x[2],
                 'Manager_name': x[3],
                 'Manager_lastname': x[4],
                 'id': x[0],
-                'Home_stadion': 'temp'}
+                'Home_stadion': stadion[0][0],
+                'balance': hajs[0][0],
+                'debt': hajs[0][1],
+                'profit': hajs[0][2],
+                'expenses': hajs[0][3],
+                'budget_id': hajs[0][4],
+                'season_name': season
+                }
 
         teams.append(team)
     return teams
@@ -78,6 +97,21 @@ def create_player(connection, cursor, name, last_name, phone):
     dane = (name, last_name, phone)
     cursor.execute(komenda, dane)
     connection.commit()
+
+
+def pobierz_wolne_stadiony(connection, cursor):
+    komenda = ("select STADION.STADION_ID, STADION.NAME,FOOTBALL_TEAM.TEAM_NAME FROM STADION LEFT JOIN FOOTBALL_TEAM ON STADION.STADION_ID=FOOTBALL_TEAM.STADION_ID;")
+    cursor.execute(komenda)
+    myresult = cursor.fetchall()
+    stadions = []
+    for x in myresult:
+        if x[2] == None:
+            stadion = {'id': x[0],
+                       'name': x[1],
+                       }
+
+            stadions.append(stadion)
+    return stadions
 
 
 def pobierz_wolnych_zawodnikow(connection, cursor):
@@ -250,16 +284,33 @@ def pobierz_gre(connection, cursor, id):
     komenda = ("select * from match_history where match_id = %s;")
 
 
-def add_team(connection, cursor, name, season, adress, capacity, manager_name, manager_surname,
-             manager_phone, balance, debt, profit, expenses):
-    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-    komenda1 = "select season_id from season where season_name = %s"
-    cursor.execute(komenda1, (season,))
-    myresult = cursor.fetchall()
-    season_id = myresult[0][0]
-    data = (name, season_id, adress, capacity, manager_name, manager_surname,
-            manager_phone, balance, debt, profit, expenses)
+def assign_player(connection, cursor, player_id, team_id):
+    komenda = "update players set team_id=%s where player_id=%s"
+    data = (team_id, player_id)
     cursor.execute(komenda, data)
+    return 0
+
+
+def add_team(connection, cursor, name, stadion_id, season_id, manager_id, balance, debt, profit, expenses, id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11):
+    komenda = "call create_team(%s,%s,%s,%s,%s,%s,%s,%s);"
+    komenda2 = "select team_id from football_team where team_name = %s"
+    data = (name, season_id, manager_id, stadion_id,
+            balance, debt, profit, expenses)
+    cursor.execute(komenda, data)
+    cursor.execute(komenda2, (name,))
+    idres = cursor.fetchall()
+    assign_player(connection, cursor, id1, idres[0][0])
+    assign_player(connection, cursor, id2, idres[0][0])
+    assign_player(connection, cursor, id3, idres[0][0])
+    assign_player(connection, cursor, id4, idres[0][0])
+    assign_player(connection, cursor, id5, idres[0][0])
+    assign_player(connection, cursor, id6, idres[0][0])
+    assign_player(connection, cursor, id7, idres[0][0])
+    assign_player(connection, cursor, id8, idres[0][0])
+    assign_player(connection, cursor, id9, idres[0][0])
+    assign_player(connection, cursor, id10, idres[0][0])
+    assign_player(connection, cursor, id11, idres[0][0])
+
     connection.commit()
 
     return 0
@@ -453,10 +504,10 @@ def delete_coach(id):
     return 0
 
 
-def create_coach(first_name, last_name, phone_number, nationality):
+def create_coach(first_name, last_name, phone_number, nationality, id):
     connection, cursor = polaczenie()
-    komenda = "insert into coach(first_name,last_name,phone_number,nationality, team_id) values (%s,%s,%s,%s,1);"
-    data = (first_name, last_name, phone_number, nationality)
+    komenda = "insert into coach(first_name,last_name,phone_number,nationality, team_id) values (%s,%s,%s,%s,%s);"
+    data = (first_name, last_name, phone_number, nationality, id)
     cursor.execute(komenda, data)
     connection.commit()
 
@@ -589,7 +640,6 @@ def pobierz_managera():
     cursor.execute(komenda)
     myresult = cursor.fetchall()
     managers = []
-    print(myresult)
     for x in myresult:
         if x[-1] == None:
             manager = {'id': x[0],
@@ -616,7 +666,6 @@ def pobierz_wolnego_managera(connection, cursor):
     cursor.execute(komenda)
     myresult = cursor.fetchall()
     managers = []
-    print(myresult)
     for x in myresult:
         if x[-1] == None:
             manager = {'id': x[0],
@@ -637,6 +686,12 @@ def delete_manager(id):
     connection.commit()
 
     return 0
+
+
+def update_manager(connection, cursor, id, name, last_name, phone):
+    cursor.execute(
+        "UPDATE TEAM_MENAGER SET FIRST_NAME=%s, last_name=%s,phone_number=%s where manager_id=%s", (name, last_name, phone, id))
+    connection.commit()
 
 
 def create_manager(first_name, last_name, phone_number):
@@ -700,7 +755,7 @@ def delete_player(connection, cursor, id):
     cursor.execute(komenda3, (myresult2[0][0],))
     myresult3 = cursor.fetchall()
     if len(myresult3) > 0:
-        if int(myresult3[0]) <= 11:
+        if int(myresult3[0][0]) <= 11:
             return "Team is too small"
     else:
         cursor.execute(komenda1, (myresult2[0][0],))
@@ -715,13 +770,29 @@ def delete_team(connection, cursor, id):
     # komenda2 = "select team_id from football_team where team_name = %s; "
     komenda1 = "update players set team_id= NULL where team_id=%s;"
     komenda = "Delete from football_team where team_id=%s;"
+    komenda2 = "select budget_id from football_team where team_id=%s"
+    komenda4 = "Delete from match_history where team1_id=%s or team2_id=%s"
+    cursor.execute(komenda2, (int(id),))
+    budżet = cursor.fetchall()
+    komenda3 = "delete from budget where budget_id=%s"
+    cursor.execute(komenda, (int(id),))
+    cursor.execute(komenda4, (int(id), int(id)))
+
+    cursor.execute(komenda3, (int(budżet[0][0]),))
     # cursor.execute(komenda2,(name,))
     # myresult2=cursor.fetchall()
     cursor.execute(komenda1, (int(id),))
-    cursor.execute(komenda, (int(id),))
+
     connection.commit()
     # odlacz(cursor, connection)
     return 0
+
+
+def delete_season(connection, cursor, id):
+    cursor.execute(
+        "update football_team set season_id=Null where season_id=%s", (int(id),))
+    cursor.execute("delete from season where season_id=%s", (int(id),))
+    connection.commit()
 
 
 def update_player(connection, cursor, id, name, last_name, phone):
@@ -739,6 +810,154 @@ def create_history(connection, cursor, id_one, id_two, score_one, score_two, dat
     stadion_id = cursor.fetchall()[0][0]
     komenda2 = "INSERT INTO match_history(team1_id,team2_id,team1_score,team2_score,match_date,stadion_id) values(%s,%s,%s,%s,%s,%s)"
     dane = (id_one, id_two, score_one, score_two, date, stadion_id)
-    print(dane)
     cursor.execute(komenda2, dane)
     connection.commit()
+
+
+def pobierz_historie(connection, cursor):
+    komenda = 'select * from match_history'
+    cursor.execute(komenda)
+    wynik1 = cursor.fetchall()
+    history = []
+    for i in wynik1:
+        cursor.execute(
+            "select team_name from football_team where team_id=%s", (int(i[1]),))
+        team1 = cursor.fetchall()
+
+        cursor.execute(
+            "select team_name from football_team where team_id=%s", (int(i[2]),))
+
+        team2 = cursor.fetchall()
+        cursor.execute(
+            "select name from stadion where stadion_id=%s", (int(i[6]),))
+        stadion = cursor.fetchall()
+        gra = {
+            'id': i[0],
+            'team1': team1[0][0],
+            'team2': team2[0][0],
+            'team1_score': i[3],
+            'team2_score': i[4],
+            'data_gry': i[5],
+            'stadion': stadion[0][0]
+        }
+        history.append(gra)
+    return history
+
+
+def delete_history(connection, cursor, id):
+    komenda = "Delete from match_history where match_id=%s;"
+    cursor.execute(komenda, (int(id),))
+    connection.commit()
+    return 0
+
+
+def update_budget(connection, cursor, id, balance, debt, profit, expenses):
+    komenda3 = "update budget SET balance=%s,dept=%s,profit=%s,expenses=%s where budget_id=%s;"
+    data2 = (balance, debt, profit, expenses, id)
+    cursor.execute(komenda3, data2)
+    return 0
+
+
+def update_team(connection, cursor, id, name, stadion_id, season_id, manager_id, balance, debt, profit, expenses):
+    komenda = "update football_team set team_name=%s,stadion_id=%s,season_id=%s,manager_id=%s where team_id=%s"
+    komenda2 = "select team_id,budget_id from football_team where team_id = %s"
+    print(name)
+    cursor.execute(komenda2, (int(id),))
+    idres = cursor.fetchall()[0][1]
+    data = (name, stadion_id, season_id, manager_id,
+            id)
+    komenda3 = "update budget SET balance=%s,dept=%s,profit=%s,expenses=%s where budget_id=%s;"
+    data2 = (balance, debt, profit, expenses, idres)
+    cursor.execute(komenda3, data2)
+    cursor.execute(komenda, data)
+    # update_budget(connection, cursor, idres, balance, debt, profit, expenses)
+    # cursor.execute("select * from football_team")
+    connection.commit()
+    return 0
+
+
+def pobierz_employee(connection, cursor):
+    komenda = (
+
+        "SELECT employee.employee_id,employee.first_name,employee.last_name,employee.phone_number,football_team.team_name FROM employee left join football_team on employee.team_id=football_team.team_id")
+    cursor.execute(komenda)
+    myresult = cursor.fetchall()
+    employees = []
+    for x in myresult:
+        komenda1 = "SELECT * from receptionist where employee_id=%s"
+        cursor.execute(komenda1, (x[0],))
+        res = cursor.fetchall()
+        if len(res) > 0:
+            employee = {'id': x[0],
+
+                        'name': x[1],
+
+                        'last_name': x[2],
+
+                        'phone': x[3],
+
+                        'Employer': x[4],
+
+                        'Recepcjonista': 'Tak'
+
+                        }
+            employees.append(employee)
+        else:
+
+            employee = {'id': x[0],
+
+                        'name': x[1],
+
+                        'last_name': x[2],
+
+                        'phone': x[3],
+
+                        'Employer': x[4],
+
+                        'Recepcjonista': 'Nie'
+
+                        }
+
+            employees.append(employee)
+
+    return employees
+
+
+def update_employee(connection, cursor, first_name, last_name, phone_number, id):
+    komenda = "update employee SET first_name=%s,last_name=%s,phone_number=%s where employee_id=%s;"
+    data = (first_name, last_name, phone_number, id)
+    cursor.execute(komenda, data)
+    connection.commit()
+
+    return 0
+
+
+def create_employee(connection, cursor, first_name, last_name, phone_number, team_id, recepcjonista):
+    komenda = "insert into employee(first_name,last_name,phone_number,team_id) values (%s,%s,%s,%s);"
+    komenda1 = "insert into receptionist(employee_id,team_id) values(%s,%s);"
+    data = (first_name, last_name, phone_number, team_id)
+    cursor.execute(komenda, data)
+    id = cursor.lastrowid
+    data1 = (id, team_id)
+    if recepcjonista == "Tak":
+        cursor.execute(komenda1, data1)
+    connection.commit()
+
+    return 0
+
+
+def delete_employee(connection, cursor, id):
+    komenda0 = "select employee.first_name, receptionist.employee_id from employee left join receptionist on employee.employee_id = receptionist.employee_id where employee.employee_id=%s"
+    cursor.execute(komenda0, (int(id),))
+    res = cursor.fetchall()
+    if res[0][1] == None:
+        komenda = "Delete from employee where employee_id=%s;"
+        cursor.execute(komenda, (int(id),))
+    else:
+        cursor.execute(
+            "Delete from receptionist where employee_id=%s", (int(id),))
+        komenda = "Delete from employee where employee_id=%s;"
+        cursor.execute(komenda, (int(id),))
+    connection.commit()
+
+    return 0

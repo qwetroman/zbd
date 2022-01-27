@@ -34,7 +34,7 @@ class AddTeamForm(FlaskForm):
 
     StadionName = SelectField(
         'Nazwa stadionu domowego', validators=[DataRequired()])
-
+    SeasonName = SelectField("Nazwa sezonu", [DataRequired()])
     TeamManagerName = SelectField(
         'Wybierz wolnego menadżera', validators=[DataRequired()])
 
@@ -64,6 +64,32 @@ class AddTeamForm(FlaskForm):
             else:
                 seen.add(field.data)
         return result
+
+
+class EditTeamForm(FlaskForm):
+
+    TeamName = StringField('Nazwa drużyny', [
+                           DataRequired(), Length(min=2)])
+
+    StadionName = SelectField(
+        'Nazwa stadionu domowego', validators=[DataRequired()])
+    SeasonName = SelectField("Nazwa sezonu", [DataRequired()])
+    TeamManagerName = SelectField(
+        'Wybierz wolnego menadżera', validators=[DataRequired()])
+
+    BudgetBalance = IntegerField(
+        'Stan budżetu drużyny', [DataRequired()])
+
+    BudgetDept = IntegerField(
+        'Dług drużyny', [Optional()])
+
+    BudgetProfit = IntegerField(
+        'Zysk drużyny', [DataRequired()])
+
+    BudgetExpenses = IntegerField(
+        'Wydatki drużyny', [DataRequired()])
+
+    submit = SubmitField("Dodaj drużynę")
 
 
 class AddGameForm(FlaskForm):
@@ -132,38 +158,6 @@ class AddSeasonForm(FlaskForm):
     submit = SubmitField("Edytuj sezon")
 
 
-class EditTeamForm(FlaskForm):
-    TeamName = StringField('Nazwa drużyny', [
-        Length(min=2)])
-
-    NumberOfPlayers = IntegerField('Liczba graczy',
-                                   [NumberRange(min=11, max=23,
-                                                message='Minimum number of'
-                                                + 'players is 11, max 23')])
-
-    StadionName = StringField('Nazwa stadionu domowego')
-
-    TeamManagerName = StringField(
-        'Imię menadżera')
-
-    TeamManagerSurname = StringField(
-        'Nazwisko menadżera')
-
-    BudgetBalance = IntegerField(
-        'Stan budżetu drużyny')
-
-    BudgetDept = IntegerField(
-        'Dług drużyny', [Optional()])
-
-    BudgetProfit = IntegerField(
-        'Zysk drużyny')
-
-    BudgetExpenses = IntegerField(
-        'Wydatki drużyny')
-
-    submit = SubmitField("Edytuj drużynę")
-
-
 class TransferForm(FlaskForm):
     Druzyny = SelectField("Drużyna do ktorej gracz zostanie przeniesiony",
                           validators=[DataRequired()])
@@ -206,4 +200,30 @@ class AddManagerForm(FlaskForm):
     name = StringField('Imię', [DataRequired()])
     last_name = StringField('Nazwisko', [DataRequired()])
     phone = StringField('Numer telefonu', [DataRequired()])
+    submit = SubmitField("Dodaj")
+
+
+class EditManagerForm(FlaskForm):
+    name = StringField('Imię', [DataRequired()])
+    last_name = StringField('Nazwisko', [DataRequired()])
+    phone = StringField('Numer telefonu', [DataRequired()])
+    submit = SubmitField("Edytuj")
+
+
+class AddEmployeeForm(FlaskForm):
+    name = StringField('Imię', [DataRequired()])
+    last_name = StringField('Nazwisko', [DataRequired()])
+    phone = StringField('Numer telefonu', [DataRequired()])
+    team = SelectField("Drużyna", [DataRequired()])
+    receptionist = SelectField("Czy recepcjonista?", choices=[
+                               "Tak", "Nie"], validators=[DataRequired()])
+    submit = SubmitField("Dodaj")
+
+
+class EditEmployeeForm(FlaskForm):
+    name = StringField('Imię', [DataRequired()])
+    last_name = StringField('Nazwisko', [DataRequired()])
+    phone = StringField('Numer telefonu', [DataRequired()])
+    # team = SelectField("Drużyna", [DataRequired()])
+
     submit = SubmitField("Dodaj")

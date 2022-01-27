@@ -122,6 +122,8 @@ def DeletePhysio(variable):
 
 @app.route('/match_history')
 def match_history():
+    connection, cursor = polaczenie()
+    History = baza.pobierz_historie(connection, cursor)
     return render_template('match_history.html', title='Historia gier',
                            posts=History)
 
@@ -147,11 +149,26 @@ def AddManager():
                            form=form, title='Dodawanie trenera')
 
 
+@app.route('/manager/edit/<int:variable>', methods=['GET', 'POST'])
+def EditManager(variable):
+    form = forms.EditManagerForm()
+    connection, cursor = polaczenie()
+    if form.validate_on_submit():
+        flash(
+            'Trener zostal pomyslnie dodany',
+            'success')
+        baza.update_manager(connection, cursor, variable, form.name.data, form.last_name.data,
+                            form.phone.data)
+        return redirect(url_for('manager'))
+
+    return render_template('editmanager.html',
+                           form=form, title='Edytowanie managera', variable=variable)
+
+
 @app.route('/stadions')
 def stadions():
     connection, cursor = polaczenie()
     Stadiony = pobierz_stadiony(connection, cursor)
-    print(Stadiony)
     odlacz(cursor, connection)
     return render_template('stadions.html', title='Stadiony',
                            posts=Stadiony)
@@ -182,7 +199,7 @@ def AddCoach():
             'Trener zostal pomyslnie dodany',
             'success')
         create_coach(form.name.data, form.last_name.data,
-                     form.phone.data, form.nationality.data)
+                     form.phone.data, form.nationality.data, int(form.team.data.split()[-1]))
         return redirect(url_for('coaches'))
     odlacz(connection, cursor)
     return render_template('addcoach.html',
@@ -208,20 +225,66 @@ def seasons():
     return render_template('seasons.html', title='Sezony', posts=sezony)
 
 
+@app.route('/teams/edit/<int:variable>', methods=['GET', 'POST'])
+def EditTeam(variable):
+    form = EditTeamForm()
+    connection, cursor = polaczenie()
+    nazwy = pobierz_nazwy_druzyn(connection, cursor)
+    cursor.execute("SELECT team_menager.first_name,team_menager.last_name,team_menager.manager_id from team_menager inner join football_team on football_team.manager_id = team_menager.manager_id where football_team.team_id=%s", (int(variable),))
+    man = cursor.fetchall()
+    man = man[0][0] + " " + man[0][1] + " " + str(man[0][2])
+    cursor.execute("SELECT stadion.name,stadion.stadion_id from stadion inner join football_team on football_team.stadion_id = stadion.stadion_id where football_team.team_id=%s", (int(variable),))
+    stad = cursor.fetchall()
+    stad = stad[0][0] + " " + str(stad[0][1])
+    stadiony = []
+    zawodnicy = []
+    menagerzy = []
+    menagerzy.append(man)
+    stadiony.append(stad)
+    sezony = []
+    for x in baza.pobierz_wolne_stadiony(connection, cursor):
+        stadiony.append(x['name'] + " " + str(x['id']))
+    for x in pobierz_sezony(connection, cursor):
+        sezony.append(x['name'] + " " + str(x['id']))
+    for x in pobierz_wolnych_zawodnikow(connection, cursor):
+        zawodnicy.append(x['name'] + " " + x['last_name'] + " " + str(x['id']))
+    for x in pobierz_wolnego_managera(connection, cursor):
+        menagerzy.append(x['Name'] + " " + x['Surname'] + " " + str(x['id']))
+    form.TeamName.NoneOf = nazwy
+    form.StadionName.choices = stadiony
+    form.TeamManagerName.choices = menagerzy
+    form.SeasonName.choices = sezony
+    if form.validate_on_submit():
+        baza.update_team(connection, cursor, variable, request.form['TeamName'], int(request.form['StadionName'].split()[-1]), int(request.form['SeasonName'].split()[-1]), int(
+            request.form['TeamManagerName'].split()[-1]), int(request.form['BudgetBalance']), int(request.form['BudgetDept']), int(request.form['BudgetProfit']), int(request.form['BudgetExpenses']))
+        connection.commit()
+        odlacz(connection, cursor)
+        flash(
+            'Drużyna została pomyślnie edytowana',
+            'success')
+        return redirect(url_for('about'))
+    return render_template('editteam.html',
+                           form=form, title='Edytowanie drużyny',
+                           variable=variable)
+
+
 @app.route('/AddTeam', methods=['GET', 'POST'])
 def AddTeam():
     form = AddTeamForm()
     connection, cursor = polaczenie()
     nazwy = pobierz_nazwy_druzyn(connection, cursor)
+    stadiony = []
     zawodnicy = []
     menagerzy = []
+    sezony = []
+    for x in baza.pobierz_wolne_stadiony(connection, cursor):
+        stadiony.append(x['name'] + " " + str(x['id']))
+    for x in pobierz_sezony(connection, cursor):
+        sezony.append(x['name'] + " " + str(x['id']))
     for x in pobierz_wolnych_zawodnikow(connection, cursor):
         zawodnicy.append(x['name'] + " " + x['last_name'] + " " + str(x['id']))
     for x in pobierz_wolnego_managera(connection, cursor):
         menagerzy.append(x['Name'] + " " + x['Surname'] + " " + str(x['id']))
-
-    stadiony = pobierz_stadiony_team(connection, cursor)
-
     form.Player1.choices = zawodnicy
     form.Player2.choices = zawodnicy
     form.Player3.choices = zawodnicy
@@ -236,7 +299,15 @@ def AddTeam():
     form.TeamName.NoneOf = nazwy
     form.StadionName.choices = stadiony
     form.TeamManagerName.choices = menagerzy
+    form.SeasonName.choices = sezony
+
     if form.validate_on_submit():
+        print((request.form['TeamName'], int(request.form['StadionName'].split()[-1]), int(request.form['SeasonName'].split()[-1]), int(request.form['TeamManagerName'].split()[-1]), int(request.form['BudgetBalance']), int(request.form['BudgetDept']), int(request.form['BudgetProfit']), int(request.form['BudgetExpenses']), int(request.form['Player1'].split()[-1]), int(request.form['Player2'].split(
+        )[-1]), int(request.form['Player3'].split()[-1]), int(request.form['Player4'].split()[-1]), int(request.form['Player5'].split()[-1]), int(request.form['Player6'].split()[-1]), int(request.form['Player7'].split()[-1]), int(request.form['Player8'].split()[-1]), int(request.form['Player9'].split()[-1]), int(request.form['Player10'].split()[-1]), int(request.form['Player11'].split()[-1]))
+        )
+        baza.add_team(connection, cursor, request.form['TeamName'], int(request.form['StadionName'].split()[-1]), int(request.form['SeasonName'].split()[-1]), int(request.form['TeamManagerName'].split()[-1]), int(request.form['BudgetBalance']), int(request.form['BudgetDept']), int(request.form['BudgetProfit']), int(request.form['BudgetExpenses']), int(request.form['Player1'].split()[-1]), int(request.form['Player2'].split(
+        )[-1]), int(request.form['Player3'].split()[-1]), int(request.form['Player4'].split()[-1]), int(request.form['Player5'].split()[-1]), int(request.form['Player6'].split()[-1]), int(request.form['Player7'].split()[-1]), int(request.form['Player8'].split()[-1]), int(request.form['Player9'].split()[-1]), int(request.form['Player10'].split()[-1]), int(request.form['Player11'].split()[-1]))
+
         flash(
             'Druzyna została pomyślnie dodana',
             'success')
@@ -256,12 +327,11 @@ def AddGame():
     form.StadionName.choices = stadiony
     if form.validate_on_submit():
         idO = form.TeamO.data.split()
-        idT = form.TeamO.data.split()
+        idT = form.TeamT.data.split()
         # request.form['Koszt'])
         flash(
             'Gra zostala pomyslnie dodana',
             'success')
-        print(request.form['GameDate'])
         baza.create_history(connection, cursor, idO[-1], idT[-1], request.form['PointsO'],
                             request.form['PointsT'], request.form['GameDate'], request.form['StadionName'])
         odlacz(connection, cursor)
@@ -314,26 +384,6 @@ def AddSeason():
         return redirect(url_for('home'))
     return render_template('addseason.html',
                            form=form, title='Dodawanie stadionu')
-
-
-@app.route('/teams/edit/<int:variable>', methods=['GET', 'POST'])
-def EditTeam(variable):
-    form = EditTeamForm()
-    connection, cursor = polaczenie()
-    Druzyny = pobierz_druzyny_do_edycji(connection, cursor, variable)
-    if form.validate_on_submit():
-        flash(
-            'Drużyna została pomyślnie edytowana',
-            'success')
-        return redirect(url_for('about'))
-    elif request.method == 'GET':
-        form.TeamName.data = Druzyny[0]['nazwa']
-        form.NumberOfPlayers.data = Druzyny[0]['Number_of_players']
-        form.TeamManagerName.data = Druzyny[0]['Manager_name']
-        form.TeamManagerSurname.data = Druzyny[0]['Manager_lastname']
-    return render_template('editteam.html',
-                           form=form, title='Edytowanie drużyny',
-                           posts=Druzyny, variable=variable)
 
 
 @app.route('/teams/squad/edit/<int:variable>', methods=['GET', 'POST'])
@@ -402,6 +452,26 @@ def EditGame(variable):
                            posts=gracz, variable=variable, form=form)
 
 
+@app.route('/match_hisotry/edit/<int:variable>', methods=['GET', 'POST'])
+def DeleteGame(variable):
+    connection, cursor = polaczenie()
+    form = DeleteStadionForm()
+    if form.validate_on_submit():
+        try:
+            baza.delete_history(connection, cursor, variable)
+            flash(
+                'Gra została pomyślnie usunięta',
+                'success')
+            odlacz(connection, cursor)
+            return redirect(url_for('match_history'))
+        except:
+            flash("Drużyna w bazie, błąd")
+            return redirect(url_for('match_history'))
+
+    odlacz(connection, cursor)
+    return render_template('delete_stadion.html', variable=variable, form=form)
+
+
 @app.route('/seasons/edit/<int:variable>', methods=['GET', 'POST'])
 def EditSeason(variable):
     connection, cursor = polaczenie()
@@ -447,11 +517,35 @@ def EditStadion(variable):
 def DeleteStadion(variable):
     form = DeleteStadionForm()
     if form.validate_on_submit():
+        try:
+            delete_stadium(variable)
+            flash(
+                'Stadion został pomyślnie usunięty',
+                'success')
+            return redirect(url_for('stadions'))
+        except:
+            flash("Błąd. Stadion domowy drużyny")
+            return redirect(url_for('stadions'))
+
+    return render_template('delete_stadion.html', variable=variable, form=form)
+
+
+@app.route('/seasons/delete/<int:variable>', methods=['GET', 'POST'])
+def DeleteSeason(variable):
+    form = DeleteStadionForm()
+    if form.validate_on_submit():
+        connection, cursor = polaczenie()
+        # try:
+        baza.delete_season(connection, cursor, variable)
         flash(
             'Stadion został pomyślnie usunięty',
             'success')
-        delete_stadium(variable)
-        return redirect(url_for('stadions'))
+        odlacz(connection, cursor)
+        return redirect(url_for('seasons'))
+        # except:
+        #     flash("Błąd. Stadion domowy drużyny")
+        #     odlacz(connection, cursor)
+        #     return redirect(url_for('seasons'))
     return render_template('delete_stadion.html', variable=variable, form=form)
 
 
@@ -467,7 +561,8 @@ def DeletePlayer(variable):
             odlacz(connection, cursor)
             return redirect(url_for('players'))
         else:
-            flash('Error')
+            flash('Cannot remove player from that team')
+            return redirect(url_for('players'))
     odlacz(connection, cursor)
     return render_template('delete_stadion.html', variable=variable, form=form)
 
@@ -499,11 +594,9 @@ def SeeTeam(variable=None):
 
 @app.route('/teams/transfer<int:player_id>', methods=['GET', 'POST'])
 def TransferPlayer(player_id):
-    print(player_id)
     connection, cursor = polaczenie()
     teams = pobierz_nazwy_druzyn(connection, cursor)
     teams.append("Wyrzuc")
-    print(teams)
     form = TransferForm()
     form.Druzyny.choices = teams
     if form.validate_on_submit():
@@ -524,6 +617,60 @@ def TransferPlayer(player_id):
             return redirect(url_for('SeeTeam', variable=session.get('team_id_to_transfer', None)))
     odlacz(connection, cursor)
     return render_template("transfer.html", form=form, player_id=player_id)
+
+
+@app.route('/employees', methods=['GET', 'POST'])
+def Employees():
+    connection, cursor = polaczenie()
+    pracownicy = baza.pobierz_employee(connection, cursor)
+    odlacz(connection, cursor)
+    return render_template("employees.html", posts=pracownicy)
+
+
+@app.route('/employees/add', methods=['GET', 'POST'])
+def AddEmployee():
+    form = forms.AddEmployeeForm()
+    connection, cursor = polaczenie()
+    teams = pobierz_nazwy_druzyn(connection, cursor)
+    form.team.choices = teams
+    if form.validate_on_submit():
+        flash(
+            'Pracownik został pomyślnie dodany',
+            'success')
+        baza.create_employee(connection, cursor, form.name.data, form.last_name.data, form.phone.data, int(
+            request.form['team'].split()[-1]), form.receptionist.data)
+        return redirect(url_for('Employees'))
+    return render_template("addemployee.html", form=form)
+
+
+@app.route('/employees/delete/<int:variable>', methods=['GET', 'POST'])
+def DeleteEmployee(variable):
+    form = DeleteStadionForm()
+    if form.validate_on_submit():
+        connection, cursor = polaczenie()
+        flash(
+            'Pracownik został pomyślnie usunięty',
+            'success')
+        baza.delete_employee(connection, cursor, variable)
+        odlacz(connection, cursor)
+        return redirect(url_for('Employees'))
+    return render_template('delete_stadion.html', variable=variable, form=form)
+
+
+@app.route('/employees/edit/<int:variable>', methods=['GET', 'POST'])
+def EditEmployee(variable):
+    form = forms.EditEmployeeForm()
+    connection, cursor = polaczenie()
+    # teams = pobierz_nazwy_druzyn(connection, cursor)
+    # form.team.choices = teams
+    if form.validate_on_submit():
+        flash(
+            'Pracownik został pomyślnie edytowany',
+            'success')
+        baza.update_employee(connection, cursor, form.name.data,
+                             form.last_name.data, form.phone.data, variable)
+        return redirect(url_for('Employees'))
+    return render_template("editemployee.html", form=form)
 
 
 if __name__ == '__main__':

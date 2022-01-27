@@ -11,6 +11,14 @@
           </th>
           <th class="th-sm">Imie i nazwisko menadżera
           </th>
+          <th class="th-sm">Sezon
+          </th>
+          <th class="th-sm">Balans
+          </th>
+          <th class="th-sm">Dług
+          </th>
+          <th class="th-sm">Profit
+          </th>
           <th class="th-sm">Zobacz
           </th>
           <th class="th-sm">Edutuj
@@ -26,6 +34,10 @@
       <td> {{post.Number_of_players}} </td>
       <td> {{post.Home_stadion}} </td>
       <td> {{post.Manager_name}} {{post.Manager_lastname}} </td>
+      <td> {{post.season_name}} </td>
+      <td> {{post.balance}} </td>
+      <td> {{post.debt}} </td>
+      <td> {{post.profit}} </td>
       <td><div class='btn btn-outline-info'>
         <a href="{{ url_for('SeeTeam', variable=post.id) }}">Zobacz skład</a>
       </div> </td>
@@ -53,7 +65,7 @@
           {searchable: false},
           {orderable: false, searchable: false},
           {orderable: false, searchable: false},
-          null,null,null],
+          null,null,null,null,null,null,null],
       });
     });
   </script>
