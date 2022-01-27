@@ -791,6 +791,7 @@ def pobierz_employee(connection, cursor):
     cursor.execute(komenda)
     myresult = cursor.fetchall()
     employees = []
+    komenda1="SELECT "
 
     for x in myresult:
         employee = {'id': x[0],
@@ -819,10 +820,10 @@ def update_employee(first_name, last_name, phone_number, id):
     return 0
 
 
-def create_employee(first_name, last_name, phone_number):
+def create_employee(first_name, last_name, phone_number,team_id):
     connection, cursor = polaczenie()
-    komenda = "insert into employees(first_name,last_name,phone_number) values (%s,%s,%s);"
-    data = (first_name, last_name, phone_number)
+    komenda = "insert into employees(first_name,last_name,phone_number,team_id) values (%s,%s,%s,%s);"
+    data = (first_name, last_name, phone_number,team_id)
     cursor.execute(komenda, data)
     connection.commit()
 
